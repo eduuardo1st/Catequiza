@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catequiza. — Controle de Chamadas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0B132B;
+      --bg-secondary: #111B3E;
+      --bg-card: #152047;
+      --bg-card-hover: #1A2755;
+      --gold: #F59E0B;
+      --gold-hover: #D97706;
+      --gold-glow: rgba(245, 158, 11, 0.25);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --green: #22C55E;
+      --green-bg: rgba(34, 197, 94, 0.12);
+      --red: #EF4444;
+      --red-bg: rgba(239, 68, 68, 0.12);
+      --border: rgba(148, 163, 184, 0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, h5, h6, .brand {
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+
+    /* ===== NAVIGATION TABS ===== */
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 16px 12px;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-tab::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20%;
+      width: 60%;
+      height: 3px;
+      background: transparent;
+      border-radius: 3px 3px 0 0;
+      transition: var(--transition);
+    }
+
+    .nav-tab.active {
+      color: var(--gold);
+    }
+
+    .nav-tab.active::after {
+      background: var(--gold);
+    }
+
+    .nav-tab:hover:not(.active) {
+      color: var(--text-primary);
+    }
+
+    .nav-tab .tab-icon {
+      display: block;
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+    }
+
+    /* ===== VIEWS ===== */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      height: 40px;
+      width: auto;
+      border-radius: 6px;
+    }
+
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+    }
+
+    .brand span {
+      color: var(--text-primary);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .greeting {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .greeting strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-logout:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-bg);
+    }
+
+    /* ===== CONTENT ===== */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 20px 100px;
+    }
+
+    /* ===== SELECTORS AREA ===== */
+    .selectors {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .selector-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .selector-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .selector-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 14px 40px 14px 16px;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    .selector-select:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
+    }
+
+    .selector-select option {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    /* ===== ATTENDANCE LIST ===== */
+    .section-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title .count {
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    .student-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .student-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      transition: var(--transition);
+    }
+
+    .student-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    .student-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .student-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .student-id {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .attendance-toggle {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+
+    .toggle-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 2px solid transparent;
+      min-width: 56px;
+      text-align: center;
+    }
+
+    .toggle-btn.present {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: rgba(34, 197, 94, 0.2);
+    }
+
+    .toggle-btn.present.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.3);
+    }
+
+    .toggle-btn.absent {
+      background: var(--red-bg);
+      color: var(--red);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .toggle-btn.absent.active {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+    }
+
+    .toggle-btn:hover:not(.active) {
+      transform: scale(1.05);
+    }
+
+    /* ===== FLOATING SAVE BUTTON ===== */
+    .save-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 20px;
+      background: linear-gradient(to top, var(--bg-primary) 60%, transparent);
+      z-index: 90;
+    }
+
+    .btn-save {
+      display: block;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 18px 24px;
+      background: var(--gold);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 20px var(--gold-glow);
+    }
+
+    .btn-save:hover {
+      background: var(--gold-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px var(--gold-glow);
+    }
+
+    .btn-save:active {
+      transform: translateY(0);
+    }
+
+    /* ===== TEMA 2: CONSULTA PUBLICA ===== */
+    .public-view {
+      min-height: calc(100vh - 56px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .public-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .public-logo {
+      height: 56px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+    }
+
+    .public-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .public-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .search-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group:last-of-type {
+      margin-bottom: 28px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9375rem;
+      transition: var(--transition);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
+    }
+
+    .form-select {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      padding: 14px 40px 14px 16px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: var(--transition);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
+    }
+
+    .form-select option {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .btn-search {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--gold);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      letter-spacing: 0.02em;
+    }
+
+    .btn-search:hover {
+      background: var(--gold-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--gold-glow);
+    }
+
+    .btn-search:active { transform: translateY(0); }
+
+    /* ===== RESULT CARD ===== */
+    .result-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      margin-top: 24px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gold-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .result-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: var(--text-primary);
+    }
+
+    .result-class {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .result-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.75rem;
+      color: var(--gold);
+    }
+
+    .stat-value.danger { color: var(--red); }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-section {
+      margin-top: 4px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .progress-text {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .progress-text strong {
+      color: var(--text-primary);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-primary);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease-out;
+    }
+
+    .progress-fill.safe { background: var(--green); }
+    .progress-fill.warning { background: var(--gold); }
+    .progress-fill.danger { background: var(--red); }
+
+    .progress-warning {
+      margin-top: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.5;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    .progress-warning.warn {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--gold);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .progress-warning.danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* ===== TOAST / NOTIFICATION ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: var(--green);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      box-shadow: 0 8px 32px rgba(34, 197, 94, 0.35);
+      z-index: 999;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 16px;
+      }
+
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .selectors {
+        grid-template-columns: 1fr;
+      }
+
+      .student-card {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .student-info {
+        flex: 1 1 calc(100% - 140px);
+      }
+
+      .attendance-toggle {
+        margin-left: 0;
+      }
+
+      .toggle-btn {
+        padding: 8px 14px;
+        font-size: 0.75rem;
+      }
+
+      .content {
+        padding: 20px 16px 100px;
+      }
+
+      .search-card {
+        padding: 24px 20px;
+      }
+
+      .public-title {
+        font-size: 1.5rem;
+      }
+
+      .nav-tab {
+        font-size: 0.8125rem;
+        padding: 14px 8px;
+      }
+
+      .result-card {
+        padding: 20px;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+      }
+
+      .progress-warning {
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      .content { padding: 28px 24px 100px; }
+    }
+
+    /* ===== SUBTLE ANIMATIONS ===== */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .view.active {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    /* ===== EMPTY STATE HIDDEN ===== */
+    .result-hidden { display: none; }
+
+    /* ===== DATE INPUT STYLE ===== */
+    input[type="date"] {
+      color-scheme: dark;
+    }
+
+    /* ===== SUMMARY STATS ===== */
+    .summary-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .summary-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .summary-chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .summary-chip .dot.green { background: var(--green); }
+    .summary-chip .dot.red { background: var(--red); }
+    .summary-chip .dot.gray { background: var(--text-muted); }
+
+    .summary-chip strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== TAB NAVIGATION ===== -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('catequista', this)">
+      <span class="tab-icon">📋</span>
+      Catequista
+    </button>
+    <button class="nav-tab" onclick="switchView('consulta', this)">
+      <span class="tab-icon">🔍</span>
+      Consultar Faltas
+    </button>
+  </nav>
+
+  <!-- ============================================ -->
+  <!-- TELA 1: VISÃO DO CATEQUISTA -->
+  <!-- ============================================ -->
+  <div id="view-catequista" class="view active">
+
+    <header class="header">
+      <div class="header-left">
+        <img src="Logo/LogoAzul.jpeg" alt="Catequiza." class="logo" onerror="this.style.display='none'">
+        <div class="brand">Catequiza<span>.</span></div>
+      </div>
+      <div class="header-right">
+        <div class="greeting">Olá, <strong>Catequista João</strong></div>
+        <button class="btn-logout" onclick="alert('Sessão encerrada.')">Sair</button>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Selectors -->
+      <div class="selectors">
+        <div class="selector-group">
+          <label class="selector-label">Turma</label>
+          <select class="selector-select" id="turma-select">
+            <option>Crisma — Sáb 16h</option>
+            <option>1ª Eucaristia — Dom 9h</option>
+            <option>Batismo — Seg 19h</option>
+          </select>
+        </div>
+        <div class="selector-group">
+          <label class="selector-label">Data da Aula</label>
+          <input type="date" class="selector-select" value="2026-08-25" id="date-select">
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-bar" id="summary-bar">
+        <div class="summary-chip">
+          <span class="dot green"></span>
+          Presentes: <strong id="count-present">0</strong>
+        </div>
+        <div class="summary-chip">
+          <span class="dot red"></span>
+          Faltas: <strong id="count-absent">0</strong>
+        </div>
+        <div class="summary-chip">
+          <span class="dot gray"></span>
+          Total: <strong>5</strong>
+        </div>
+      </div>
+
+      <!-- List Header -->
+      <div class="section-title">
+        Chamada
+        <span class="count">5 alunos</span>
+      </div>
+
+      <!-- Student List -->
+      <div class="student-list" id="student-list">
+
+        <div class="student-card" data-student="1">
+          <div class="student-info">
+            <div class="student-name">Maria Clara Silva</div>
+            <div class="student-id">Matrícula #10045</div>
+          </div>
+          <div class="attendance-toggle">
+            <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+            <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+          </div>
+        </div>
+
+        <div class="student-card" data-student="2">
+          <div class="student-info">
+            <div class="student-name">Pedro Henrique Oliveira</div>
+            <div class="student-id">Matrícula #10078</div>
+          </div>
+          <div class="attendance-toggle">
+            <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+            <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+          </div>
+        </div>
+
+        <div class="student-card" data-student="3">
+          <div class="student-info">
+            <div class="student-name">Ana Beatriz Costa</div>
+            <div class="student-id">Matrícula #10112</div>
+          </div>
+          <div class="attendance-toggle">
+            <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+            <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+          </div>
+        </div>
+
+        <div class="student-card" data-student="4">
+          <div class="student-info">
+            <div class="student-name">Lucas Felipe Santos</div>
+            <div class="student-id">Matrícula #10203</div>
+          </div>
+          <div class="attendance-toggle">
+            <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+            <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+          </div>
+        </div>
+
+        <div class="student-card" data-student="5">
+          <div class="student-info">
+            <div class="student-name">Juliana Ferreira Lima</div>
+            <div class="student-id">Matrícula #10350</div>
+          </div>
+          <div class="attendance-toggle">
+            <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+            <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Floating Save Button -->
+    <div class="save-bar">
+      <button class="btn-save" onclick="saveAttendance()">💾 Salvar Chamada</button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- TELA 2: CONSULTA DE FALTAS (PÚBLICA) -->
+  <!-- ============================================ -->
+  <div id="view-consulta" class="view">
+
+    <div class="public-view">
+      <div class="public-header">
+        <img src="Logo/LogoAzul.jpeg" alt="Catequiza." class="public-logo" onerror="this.style.display='none'">
+        <h1 class="public-title">Catequiza<span style="color:var(--text-primary)">.</span></h1>
+        <p class="public-subtitle">Consulte a situação de frequência do catequizando</p>
+      </div>
+
+      <div class="search-card">
+        <div class="form-group">
+          <label class="form-label" for="search-name">Nome Completo</label>
+          <input type="text" class="form-input" id="search-name" placeholder="Digite o nome do aluno" value="Pedro Henrique Oliveira">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="search-id">Matrícula</label>
+          <input type="text" class="form-input" id="search-id" placeholder="Ex: #10078" value="#10078">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="search-class">Turma</label>
+          <select class="form-select" id="search-class">
+            <option value="">Selecione a turma</option>
+            <option>Crisma — Sáb 16h</option>
+            <option selected>1ª Eucaristia — Dom 9h</option>
+            <option>Batismo — Seg 19h</option>
+          </select>
+        </div>
+        <button class="btn-search" onclick="searchAbsences()">🔍 Consultar Faltas</button>
+      </div>
+
+      <!-- Result (hidden by default) -->
+      <div class="result-card result-hidden" id="result-card">
+        <div class="result-header">
+          <div class="result-avatar">👤</div>
+          <div>
+            <div class="result-name" id="result-name">Pedro Henrique</div>
+            <div class="result-class" id="result-class">Turma: 1ª Eucaristia</div>
+          </div>
+        </div>
+        <div class="result-stats">
+          <div class="stat-item">
+            <div class="stat-value danger" id="result-absences">2</div>
+            <div class="stat-label">Faltas</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="result-presences">8</div>
+            <div class="stat-label">Presenças</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="result-percentage">80%</div>
+            <div class="stat-label">Frequência</div>
+          </div>
+        </div>
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-text">Limite de faltas no semestre</span>
+            <span class="progress-text"><strong id="result-limit-text">2</strong> / 5</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill warning" id="result-progress" style="width: 40%"></div>
+          </div>
+          <div class="progress-warning warn" id="result-warning">
+            ⚠️ Atenção: O aluno possui 2 faltas de um limite de 5 no semestre.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">✓ Chamada salva com sucesso!</div>
+
+  <script>
+    // ===== VIEW SWITCHING =====
+    function switchView(view, el) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+      document.getElementById('view-' + view).classList.add('active');
+      if (el) el.classList.add('active');
+      else if (view === 'catequista') document.querySelectorAll('.nav-tab')[0].classList.add('active');
+      else document.querySelectorAll('.nav-tab')[1].classList.add('active');
+    }
+
+    // ===== ATTENDANCE TOGGLES =====
+    function toggleAttendance(btn, type) {
+      const card = btn.closest('.student-card');
+      const presentBtn = card.querySelector('.toggle-btn.present');
+      const absentBtn = card.querySelector('.toggle-btn.absent');
+
+      if (type === 'present') {
+        presentBtn.classList.toggle('active');
+        absentBtn.classList.remove('active');
+      } else {
+        absentBtn.classList.toggle('active');
+        presentBtn.classList.remove('active');
+      }
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const present = document.querySelectorAll('.toggle-btn.present.active').length;
+      const absent = document.querySelectorAll('.toggle-btn.absent.active').length;
+      document.getElementById('count-present').textContent = present;
+      document.getElementById('count-absent').textContent = absent;
+    }
+
+    // ===== SAVE ATTENDANCE =====
+    function saveAttendance() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ===== SEARCH ABSENCES =====
+    function searchAbsences() {
+      const name = document.getElementById('search-name').value;
+      const turma = document.getElementById('search-class').value;
+
+      if (!name) {
+        alert('Por favor, preencha o nome do aluno.');
+        return;
+      }
+
+      // Mock data based on search
+      const students = {
+        'pedro henrique oliveira': {
+          name: 'Pedro Henrique',
+          turma: '1ª Eucaristia',
+          absences: 2,
+          presences: 8,
+          limit: 5
+        },
+        'maria clara silva': {
+          name: 'Maria Clara Silva',
+          turma: 'Crisma',
+          absences: 0,
+          presences: 10,
+          limit: 5
+        },
+        'ana beatriz costa': {
+          name: 'Ana Beatriz Costa',
+          turma: '1ª Eucaristia',
+          absences: 4,
+          presences: 6,
+          limit: 5
+        },
+        'lucas felipe santos': {
+          name: 'Lucas Felipe Santos',
+          turma: 'Batismo',
+          absences: 1,
+          presences: 9,
+          limit: 5
+        }
+      };
+
+      const key = name.toLowerCase().trim();
+      const student = students[key] || {
+        name: name.split(' ').slice(0, 2).join(' '),
+        turma: turma || 'Não informada',
+        absences: Math.floor(Math.random() * 4),
+        presences: 7 + Math.floor(Math.random() * 3),
+        limit: 5
+      };
+
+      const total = student.absences + student.presences;
+      const pct = Math.round((student.presences / total) * 100);
+      const progressPct = Math.min((student.absences / student.limit) * 100, 100);
+
+      // Update result card
+      document.getElementById('result-name').textContent = student.name;
+      document.getElementById('result-class').textContent = 'Turma: ' + student.turma;
+      document.getElementById('result-absences').textContent = student.absences;
+      document.getElementById('result-presences').textContent = student.presences;
+      document.getElementById('result-percentage').textContent = pct + '%';
+      document.getElementById('result-limit-text').textContent = student.absences;
+
+      // Progress bar
+      const progressBar = document.getElementById('result-progress');
+      progressBar.style.width = progressPct + '%';
+      progressBar.className = 'progress-fill';
+      if (progressPct >= 80) {
+        progressBar.classList.add('danger');
+      } else if (progressPct >= 40) {
+        progressBar.classList.add('warning');
+      } else {
+        progressBar.classList.add('safe');
+      }
+
+      // Warning message
+      const warning = document.getElementById('result-warning');
+      if (student.absences === 0) {
+        warning.className = 'progress-warning';
+        warning.style.display = 'none';
+      } else if (student.absences >= student.limit - 1) {
+        warning.className = 'progress-warning danger';
+        warning.innerHTML = '🚨 Perigo: O aluno possui <strong>' + student.absences + ' faltas</strong> de um limite de ' + student.limit + ' no semestre.';
+        warning.style.display = 'flex';
+      } else {
+        warning.className = 'progress-warning warn';
+        warning.innerHTML = '⚠️ Atenção: O aluno possui <strong>' + student.absences + ' falta(s)</strong> de um limite de ' + student.limit + ' no semestre.';
+        warning.style.display = 'flex';
+      }
+
+      // Absences stat color
+      const absStat = document.getElementById('result-absences');
+      absStat.className = 'stat-value' + (student.absences >= 3 ? ' danger' : '');
+
+      // Show result
+      const resultCard = document.getElementById('result-card');
+      resultCard.classList.remove('result-hidden');
+      resultCard.style.animation = 'none';
+      resultCard.offsetHeight; // reflow
+      resultCard.style.animation = 'slideUp 0.4s ease-out';
+    }
+  </script>
+</body>
+</html>
