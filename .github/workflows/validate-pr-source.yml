@@ -1,0 +1,22 @@
+name: validate-pr-source
+
+on:
+  pull_request:
+    branches:
+      - main
+      - homolog
+
+jobs:
+  validate-source:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$BASE_REF" = "homolog" ] && [ "$HEAD_REF" != "dev" ]; then
+            exit 1
+          fi
+          if [ "$BASE_REF" = "main" ] && [ "$HEAD_REF" != "homolog" ]; then
+            exit 1
+          fi
