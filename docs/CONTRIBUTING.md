@@ -73,12 +73,14 @@ Todas as mensagens devem seguir o padrão [Conventional Commits](https://www.con
 
 | Tipo       | Exemplo                                          |
 | ---------- | ------------------------------------------------ |
-| `feat`     | `feat(backend): adicionar endpoint de turmas`    |
-| `fix`      | `fix(frontend): corrigir toggle de presença`     |
+| `feat`     | `feat(backend-admin): adicionar endpoint de turmas` |
+| `fix`      | `fix(frontend-aluno): corrigir consulta pública` |
 | `docs`     | `docs: adicionar ADR de CI/CD`                   |
-| `chore`    | `chore: atualizar Spring Boot para 4.1.1`        |
+| `chore`    | `chore: atualizar Spring Boot para 3.3.2`        |
 | `refactor` | `refactor: extrair lógica de validação`          |
 | `test`     | `test: adicionar teste unitário para UserController` |
+
+> **Escopos disponíveis:** `backend-admin`, `backend-aluno`, `frontend-admin`, `frontend-aluno`, `ci`, `docs`. Uma alteração no app do catequizando (`app-catequizando/**`) não deve usar escopo do app do catequista (`app-catequista/**`).
 
 ### Regras
 
@@ -95,8 +97,8 @@ Todas as mensagens devem seguir o padrão [Conventional Commits](https://www.con
 Seguir o padrão de commit:
 
 ```
-feat(backend): adicionar CRUD de turmas
-fix(frontend): corrigir layout mobile na tela de consulta
+feat(backend-admin): adicionar CRUD de turmas
+fix(frontend-aluno): corrigir layout mobile na tela de consulta
 ```
 
 ### Regras

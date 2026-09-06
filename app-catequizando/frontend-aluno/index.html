@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catequiza. — Consulta de Frequência</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+  <div class="public-view">
+    <div class="public-header">
+      <img src="Logo/LogoAzul.jpeg" alt="Catequiza." class="public-logo" onerror="this.style.display='none'">
+      <h1 class="public-title">Catequiza<span style="color:var(--text-primary)">.</span></h1>
+      <p class="public-subtitle">Consulte a situação de frequência do catequizando</p>
+    </div>
+
+    <div class="search-card">
+      <div class="form-group">
+        <label class="form-label" for="search-name">Nome Completo</label>
+        <input type="text" class="form-input" id="search-name" placeholder="Digite o nome do aluno" value="Pedro Henrique Oliveira">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="search-id">Matrícula</label>
+        <input type="text" class="form-input" id="search-id" placeholder="Ex: #10078" value="#10078">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="search-class">Turma</label>
+        <select class="form-select" id="search-class">
+          <option value="">Selecione a turma</option>
+          <option>Crisma — Sáb 16h</option>
+          <option selected>1ª Eucaristia — Dom 9h</option>
+          <option>Batismo — Seg 19h</option>
+        </select>
+      </div>
+      <button class="btn-search" onclick="searchAbsences()">🔍 Consultar Faltas</button>
+    </div>
+
+    <!-- Result (hidden by default) -->
+    <div class="result-card result-hidden" id="result-card">
+      <div class="result-header">
+        <div class="result-avatar">👤</div>
+        <div>
+          <div class="result-name" id="result-name">Pedro Henrique</div>
+          <div class="result-class" id="result-class">Turma: 1ª Eucaristia</div>
+        </div>
+      </div>
+      <div class="result-stats">
+        <div class="stat-item">
+          <div class="stat-value danger" id="result-absences">2</div>
+          <div class="stat-label">Faltas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="result-presences">8</div>
+          <div class="stat-label">Presenças</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="result-percentage">80%</div>
+          <div class="stat-label">Frequência</div>
+        </div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-text">Limite de faltas no semestre</span>
+          <span class="progress-text"><strong id="result-limit-text">2</strong> / 5</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill warning" id="result-progress" style="width: 40%"></div>
+        </div>
+        <div class="progress-warning warn" id="result-warning">
+          ⚠️ Atenção: O aluno possui 2 faltas de um limite de 5 no semestre.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== SEARCH ABSENCES =====
+    function searchAbsences() {
+      const name = document.getElementById('search-name').value;
+      const turma = document.getElementById('search-class').value;
+
+      if (!name) {
+        alert('Por favor, preencha o nome do aluno.');
+        return;
+      }
+
+      // Mock data based on search
+      const students = {
+        'pedro henrique oliveira': {
+          name: 'Pedro Henrique',
+          turma: '1ª Eucaristia',
+          absences: 2,
+          presences: 8,
+          limit: 5
+        },
+        'maria clara silva': {
+          name: 'Maria Clara Silva',
+          turma: 'Crisma',
+          absences: 0,
+          presences: 10,
+          limit: 5
+        },
+        'ana beatriz costa': {
+          name: 'Ana Beatriz Costa',
+          turma: '1ª Eucaristia',
+          absences: 4,
+          presences: 6,
+          limit: 5
+        },
+        'lucas felipe santos': {
+          name: 'Lucas Felipe Santos',
+          turma: 'Batismo',
+          absences: 1,
+          presences: 9,
+          limit: 5
+        }
+      };
+
+      const key = name.toLowerCase().trim();
+      const student = students[key] || {
+        name: name.split(' ').slice(0, 2).join(' '),
+        turma: turma || 'Não informada',
+        absences: Math.floor(Math.random() * 4),
+        presences: 7 + Math.floor(Math.random() * 3),
+        limit: 5
+      };
+
+      const total = student.absences + student.presences;
+      const pct = Math.round((student.presences / total) * 100);
+      const progressPct = Math.min((student.absences / student.limit) * 100, 100);
+
+      // Update result card
+      document.getElementById('result-name').textContent = student.name;
+      document.getElementById('result-class').textContent = 'Turma: ' + student.turma;
+      document.getElementById('result-absences').textContent = student.absences;
+      document.getElementById('result-presences').textContent = student.presences;
+      document.getElementById('result-percentage').textContent = pct + '%';
+      document.getElementById('result-limit-text').textContent = student.absences;
+
+      // Progress bar
+      const progressBar = document.getElementById('result-progress');
+      progressBar.style.width = progressPct + '%';
+      progressBar.className = 'progress-fill';
+      if (progressPct >= 80) {
+        progressBar.classList.add('danger');
+      } else if (progressPct >= 40) {
+        progressBar.classList.add('warning');
+      } else {
+        progressBar.classList.add('safe');
+      }
+
+      // Warning message
+      const warning = document.getElementById('result-warning');
+      if (student.absences === 0) {
+        warning.className = 'progress-warning';
+        warning.style.display = 'none';
+      } else if (student.absences >= student.limit - 1) {
+        warning.className = 'progress-warning danger';
+        warning.innerHTML = '🚨 Perigo: O aluno possui <strong>' + student.absences + ' faltas</strong> de um limite de ' + student.limit + ' no semestre.';
+        warning.style.display = 'flex';
+      } else {
+        warning.className = 'progress-warning warn';
+        warning.innerHTML = '⚠️ Atenção: O aluno possui <strong>' + student.absences + ' falta(s)</strong> de um limite de ' + student.limit + ' no semestre.';
+        warning.style.display = 'flex';
+      }
+
+      // Absences stat color
+      const absStat = document.getElementById('result-absences');
+      absStat.className = 'stat-value' + (student.absences >= 3 ? ' danger' : '');
+
+      // Show result
+      const resultCard = document.getElementById('result-card');
+      resultCard.classList.remove('result-hidden');
+      resultCard.style.animation = 'none';
+      resultCard.offsetHeight; // reflow
+      resultCard.style.animation = 'slideUp 0.4s ease-out';
+    }
+  </script>
+</body>
+</html>
