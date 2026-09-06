@@ -9,9 +9,9 @@
 
 ## Contexto
 
-O projeto utiliza PostgreSQL tanto em testes automatizados (CI/local) quanto em produção (Render). As credenciais são completamente diferentes entre esses ambientes, e as credenciais de produção não podem ficar no repositório.
+O projeto utiliza PostgreSQL tanto em testes automatizados (CI/local) quanto em produção (Render). As duas APIs Spring Boot (`backend-admin` e `backend-aluno`) compartilham o **mesmo banco** (Shared Database Pattern — ver [ADR 003](003-shared-database-pattern.md)). As credenciais são completamente diferentes entre esses ambientes, e as credenciais de produção não podem ficar no repositório.
 
-**Problema central:** Como configurar o banco de dados de forma que funcione imediatamente em desenvolvimento e em produção, sem expor credenciais sensíveis.
+**Problema central:** Como configurar o banco de dados compartilhado de forma que funcione imediatamente em desenvolvimento e em produção, sem expor credenciais sensíveis.
 
 ---
 
@@ -24,12 +24,16 @@ Utilizar **configuração dual**:
 
 ### Configuração local (`application.properties`)
 
+Ambos os back-ends usam a mesma base (diferindo em `server.port`: 8080 no admin, 8081 no aluno):
+
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/catequiza-test
-spring.datasource.username=catequiza
-spring.datasource.password=catequiza
-spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:catequiza-test}
+spring.datasource.username=${DB_USERNAME:catequiza}
+spring.datasource.password=${DB_PASSWORD:catequiza}
+spring.jpa.hibernate.ddl-auto=validate
 ```
+
+> **Flyway:** `spring.flyway.enabled=true` apenas no `backend-admin` (dono do schema); no `backend-aluno` é **obrigatório** `spring.flyway.enabled=false` (ver [ADR 003](003-shared-database-pattern.md)).
 
 ### Variáveis de ambiente (Render)
 
@@ -38,6 +42,9 @@ spring.jpa.hibernate.ddl-auto=update
 | `SPRING_DATASOURCE_URL`         | `spring.datasource.url`          |
 | `SPRING_DATASOURCE_USERNAME`    | `spring.datasource.username`     |
 | `SPRING_DATASOURCE_PASSWORD`    | `spring.datasource.password`     |
+| `DB_HOST` / `DB_PORT` / `DB_NAME` | Interpoladas dentro de `spring.datasource.url` |
+| `DB_USERNAME` / `DB_PASSWORD`   | Interpoladas dentro de `spring.datasource.username/password` |
+| `SPRING_FLYWAY_ENABLED`         | `spring.flyway.enabled` (true no admin, false no aluno) |
 
 ### Como funciona o Relaxed Binding
 

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catequiza. — Controle de Chamadas (Catequista)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <img src="Logo/LogoAzul.jpeg" alt="Catequiza." class="logo" onerror="this.style.display='none'">
+      <div class="brand">Catequiza<span>.</span></div>
+    </div>
+    <div class="header-right">
+      <div class="greeting">Olá, <strong>Catequista João</strong></div>
+      <button class="btn-logout" onclick="alert('Sessão encerrada.')">Sair</button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- Selectors -->
+    <div class="selectors">
+      <div class="selector-group">
+        <label class="selector-label">Turma</label>
+        <select class="selector-select" id="turma-select">
+          <option>Crisma — Sáb 16h</option>
+          <option>1ª Eucaristia — Dom 9h</option>
+          <option>Batismo — Seg 19h</option>
+        </select>
+      </div>
+      <div class="selector-group">
+        <label class="selector-label">Data da Aula</label>
+        <input type="date" class="selector-select" value="2026-08-25" id="date-select">
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-bar" id="summary-bar">
+      <div class="summary-chip">
+        <span class="dot green"></span>
+        Presentes: <strong id="count-present">0</strong>
+      </div>
+      <div class="summary-chip">
+        <span class="dot red"></span>
+        Faltas: <strong id="count-absent">0</strong>
+      </div>
+      <div class="summary-chip">
+        <span class="dot gray"></span>
+        Total: <strong>5</strong>
+      </div>
+    </div>
+
+    <!-- List Header -->
+    <div class="section-title">
+      Chamada
+      <span class="count">5 alunos</span>
+    </div>
+
+    <!-- Student List -->
+    <div class="student-list" id="student-list">
+
+      <div class="student-card" data-student="1">
+        <div class="student-info">
+          <div class="student-name">Maria Clara Silva</div>
+          <div class="student-id">Matrícula #10045</div>
+        </div>
+        <div class="attendance-toggle">
+          <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+          <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+        </div>
+      </div>
+
+      <div class="student-card" data-student="2">
+        <div class="student-info">
+          <div class="student-name">Pedro Henrique Oliveira</div>
+          <div class="student-id">Matrícula #10078</div>
+        </div>
+        <div class="attendance-toggle">
+          <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+          <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+        </div>
+      </div>
+
+      <div class="student-card" data-student="3">
+        <div class="student-info">
+          <div class="student-name">Ana Beatriz Costa</div>
+          <div class="student-id">Matrícula #10112</div>
+        </div>
+        <div class="attendance-toggle">
+          <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+          <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+        </div>
+      </div>
+
+      <div class="student-card" data-student="4">
+        <div class="student-info">
+          <div class="student-name">Lucas Felipe Santos</div>
+          <div class="student-id">Matrícula #10203</div>
+        </div>
+        <div class="attendance-toggle">
+          <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+          <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+        </div>
+      </div>
+
+      <div class="student-card" data-student="5">
+        <div class="student-info">
+          <div class="student-name">Juliana Ferreira Lima</div>
+          <div class="student-id">Matrícula #10350</div>
+        </div>
+        <div class="attendance-toggle">
+          <button class="toggle-btn present" onclick="toggleAttendance(this, 'present')">✓ Presente</button>
+          <button class="toggle-btn absent" onclick="toggleAttendance(this, 'absent')">✗ Falta</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Floating Save Button -->
+  <div class="save-bar">
+    <button class="btn-save" onclick="saveAttendance()">💾 Salvar Chamada</button>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">✓ Chamada salva com sucesso!</div>
+
+  <script>
+    // ===== ATTENDANCE TOGGLES =====
+    function toggleAttendance(btn, type) {
+      const card = btn.closest('.student-card');
+      const presentBtn = card.querySelector('.toggle-btn.present');
+      const absentBtn = card.querySelector('.toggle-btn.absent');
+
+      if (type === 'present') {
+        presentBtn.classList.toggle('active');
+        absentBtn.classList.remove('active');
+      } else {
+        absentBtn.classList.toggle('active');
+        presentBtn.classList.remove('active');
+      }
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const present = document.querySelectorAll('.toggle-btn.present.active').length;
+      const absent = document.querySelectorAll('.toggle-btn.absent.active').length;
+      document.getElementById('count-present').textContent = present;
+      document.getElementById('count-absent').textContent = absent;
+    }
+
+    // ===== SAVE ATTENDANCE =====
+    function saveAttendance() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
