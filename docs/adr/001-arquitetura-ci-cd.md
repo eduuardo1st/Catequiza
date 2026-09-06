@@ -30,25 +30,27 @@ O projeto Catequiza precisa de uma esteira de CI/CD que:
 | Container Registry | Docker Hub                          |
 | Hospedagem         | Render (Web Service + Managed DB)   |
 
-### Workflows implementados
+### Workflows implementados (um par por app)
 
-#### `lint-backend.yml` — Análise estática
+Os pipelines são divididos por aplicação, com **filtros de paths** nos gatilhos (`on: push: paths:` / `on: pull_request: paths:`): uma alteração em `app-catequizando/**` não dispara pipelines do `app-catequista/**` (e vice-versa), economizando tempo de execução.
 
-- **Trigger:** PR ou push em `dev` (quando `backend/` é alterado).
-- **Ação:** `mvn validate process-classes`
+#### `lint-backend-admin.yml` / `lint-backend-aluno.yml` — Análise estática
 
-#### `test-backend.yml` — Testes automatizados
+- **Trigger:** PR ou push em `dev` (quando o respectivo `backend-*/` é alterado).
+- **Ação:** `mvn validate process-classes` no diretório do app.
 
-- **Trigger:** PR que altera `backend/`.
-- **Ação:** Sobe PostgreSQL 16 como *service container* do GitHub Actions e executa `mvn test`.
+#### `test-backend-admin.yml` / `test-backend-aluno.yml` — Testes automatizados
 
-#### `deploy-backend-dev.yml` — Build e deploy
+- **Trigger:** PR que altera o respectivo `backend-*/`.
+- **Ação:** Sobe PostgreSQL 16 como *service container* do GitHub Actions e executa `mvn test`. No `backend-admin` o Flyway valida as migrações; no `backend-aluno` ele permanece desabilitado (ver [ADR 003](003-shared-database-pattern.md)).
 
-- **Trigger:** Push em `dev`.
+#### `deploy-backend-admin-dev.yml` / `deploy-backend-aluno-dev.yml` — Build e deploy
+
+- **Trigger:** Push em `dev` com alterações no respectivo app.
 - **Ações:**
   1. Build da imagem Docker (multi-stage: Maven → JRE).
-  2. Push para Docker Hub com tag `dev`.
-  3. Dispara o **Deploy Hook** do Render via `curl`.
+  2. Push para Docker Hub com tag `dev` (`catequiza-backend-admin:dev` / `catequiza-backend-aluno:dev`).
+  3. Dispara o **Deploy Hook** do Render via `curl` (secrets `RENDER_DEPLOY_HOOK_URL_BACKEND_ADMIN` / `RENDER_DEPLOY_HOOK_URL_BACKEND_ALUNO`).
 
 #### `validate-pr-source.yml` — Validação de origem
 
@@ -65,19 +67,19 @@ feat/minha-feature (branch local)
         ▼
    PR → dev
         │
-   ┌────┴─────────────────────────────────┐
-   │  ✅ lint-backend.yml                 │
-   │  ✅ test-backend.yml                 │
-   └────┬─────────────────────────────────┘
+   ┌────┴───────────────────────────────────────────┐
+   │  ✅ lint-backend-admin.yml / lint-backend-aluno.yml │
+   │  ✅ test-backend-admin.yml / test-backend-aluno.yml │
+   └────┬───────────────────────────────────────────┘
         │
    Merge em dev
         │
         ▼
-   deploy-backend-dev.yml
-   ┌──────────────────────────────────────┐
-   │  🐳 Docker build → Docker Hub       │
-   │  🔗 Deploy Hook → Render            │
-   └──────────────────────────────────────┘
+   deploy-backend-admin-dev.yml / deploy-backend-aluno-dev.yml
+   ┌──────────────────────────────────────────────────────┐
+   │  🐳 Docker build → Docker Hub (imagem por app)      │
+   │  🔗 Deploy Hook → Render                            │
+   └──────────────────────────────────────────────────────┘
         │
         ▼
    Render: baixa nova imagem e reinicia o serviço
