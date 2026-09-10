@@ -8,16 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "catequizando")
-public class Catequizando {
+@Table(name = "catequista")
+public class Catequista {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "matricula")
-    private Long matricula;
-
-    @Column(name = "cpf", nullable = false, unique = true)
-    private String cpf;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "nome", nullable = false)
     private String nome;
@@ -25,26 +22,21 @@ public class Catequizando {
     @Column(name = "telefone")
     private String telefone;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    public Catequizando() {
+    @Column(name = "senha", nullable = false)
+    private String senha;
+
+    public Catequista() {
     }
 
-    public Long getMatricula() {
-        return matricula;
+    public Long getId() {
+        return id;
     }
 
-    public void setMatricula(Long matricula) {
-        this.matricula = matricula;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() {
@@ -69,5 +61,13 @@ public class Catequizando {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 }
