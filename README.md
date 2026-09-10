@@ -4,6 +4,18 @@ Sistema de gestão de registros de paróquia e catequese — secretaria, catequi
 
 O **Catequiza** está em fase inicial de desenvolvimento. O projeto segue a arquitetura **Shared Database Pattern**: duas APIs Spring Boot independentes compartilhando o mesmo banco PostgreSQL, com isolamento de recursos entre o painel administrativo (secretaria/catequistas) e a consulta pública dos catequizandos (ver [ADR 003](docs/adr/003-shared-database-pattern.md)).
 
+## 🚀 Ambientes de Produção
+
+**Front-ends (Interfaces)**
+* **Painel Administrativo:** [https://catequiza-admin.vercel.app/](https://catequiza-admin.vercel.app/)
+* **Portal Público (Aluno):** [https://catequiza-aluno.vercel.app/](https://catequiza-aluno.vercel.app/)
+
+**Back-ends (APIs)**
+* **API Admin:** [https://catequiza-backend-dev.onrender.com/](https://catequiza-backend-dev.onrender.com/)
+* **API Aluno:** [https://catequiza-backend-aluno.onrender.com/](https://catequiza-backend-aluno.onrender.com/)
+
+📐 **Guia de Arquitetura:** [Entenda a estrutura do Monorepo e Shared Database Pattern](docs/guia-arquitetura.md)
+
 ---
 
 ## 🛠 Stack
