@@ -1,4 +1,4 @@
-package com.catequiza.admin.repository;
+package com.catequiza.admin.repositories;
 
 import com.catequiza.admin.domain.Catequista;
 import java.util.Optional;

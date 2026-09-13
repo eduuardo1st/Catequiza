@@ -1,6 +1,6 @@
 package com.catequiza.admin.security;
 
-import com.catequiza.admin.repository.CatequistaRepository;
+import com.catequiza.admin.repositories.CatequistaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

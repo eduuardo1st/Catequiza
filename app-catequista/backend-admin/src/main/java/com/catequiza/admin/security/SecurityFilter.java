@@ -1,7 +1,7 @@
 package com.catequiza.admin.security;
 
 import com.catequiza.admin.domain.Catequista;
-import com.catequiza.admin.repository.CatequistaRepository;
+import com.catequiza.admin.repositories.CatequistaRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
