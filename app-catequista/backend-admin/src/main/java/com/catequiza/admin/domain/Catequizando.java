@@ -1,5 +1,7 @@
 package com.catequiza.admin.domain;
 
+import com.catequiza.admin.controllers.dto.DadosCadastroCatequizando;
+import com.catequiza.admin.controllers.dto.DadosAtualizacaoCatequizando;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +31,25 @@ public class Catequizando {
     private String email;
 
     public Catequizando() {
+    }
+
+    public Catequizando(DadosCadastroCatequizando dados) {
+        this.cpf = dados.cpf();
+        this.nome = dados.nome();
+        this.telefone = dados.telefone();
+        this.email = dados.email();
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoCatequizando dados) {
+        if (dados.nome() != null) {
+            this.nome = dados.nome();
+        }
+        if (dados.telefone() != null) {
+            this.telefone = dados.telefone();
+        }
+        if (dados.email() != null) {
+            this.email = dados.email();
+        }
     }
 
     public Long getMatricula() {
