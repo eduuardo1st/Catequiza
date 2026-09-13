@@ -1,5 +1,7 @@
 package com.catequiza.admin.domain;
 
+import com.catequiza.admin.controllers.dto.DadosCadastroTurma;
+import com.catequiza.admin.controllers.dto.DadosAtualizacaoTurma;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +31,21 @@ public class Turma {
     private Integer anoLetivo;
 
     public Turma() {
+    }
+
+    public Turma(DadosCadastroTurma dados, Catequista catequista) {
+        this.catequista = catequista;
+        this.nomeTurma = dados.nomeTurma();
+        this.anoLetivo = dados.anoLetivo();
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoTurma dados) {
+        if (dados.nomeTurma() != null) {
+            this.nomeTurma = dados.nomeTurma();
+        }
+        if (dados.anoLetivo() != null) {
+            this.anoLetivo = dados.anoLetivo();
+        }
     }
 
     public Long getId() {
