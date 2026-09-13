@@ -33,6 +33,12 @@ public class Chamada {
     public Chamada() {
     }
 
+    public Chamada(Aula aula, Catequizando catequizando) {
+        this.aula = aula;
+        this.catequizando = catequizando;
+        this.presente = true;
+    }
+
     public Long getId() {
         return id;
     }
