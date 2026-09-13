@@ -1,5 +1,6 @@
 package com.catequiza.admin.domain;
 
+import com.catequiza.admin.controllers.dto.DadosAtualizacaoFila;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +34,10 @@ public class FilaEspera {
     private String status;
 
     public FilaEspera() {
+    }
+
+    public void atualizarStatus(DadosAtualizacaoFila dados) {
+        this.status = dados.status();
     }
 
     public Long getId() {
