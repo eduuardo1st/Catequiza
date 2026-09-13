@@ -35,6 +35,13 @@ public class FilaEspera {
     public FilaEspera() {
     }
 
+    public FilaEspera(Catequizando catequizando, String sacramentoDesejado) {
+        this.catequizando = catequizando;
+        this.sacramentoDesejado = sacramentoDesejado;
+        this.dataSolicitacao = java.time.LocalDate.now();
+        this.status = "AGUARDANDO";
+    }
+
     public Long getId() {
         return id;
     }
