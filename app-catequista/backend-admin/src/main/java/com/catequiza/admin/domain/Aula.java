@@ -1,5 +1,7 @@
 package com.catequiza.admin.domain;
 
+import com.catequiza.admin.controllers.dto.DadosCadastroAula;
+import com.catequiza.admin.controllers.dto.DadosAtualizacaoAula;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "aula")
@@ -37,6 +40,23 @@ public class Aula {
     private String descricaoConteudo;
 
     public Aula() {
+    }
+
+    public Aula(DadosCadastroAula dados, Turma turma) {
+        this.turma = turma;
+        this.data = dados.data();
+        this.descricaoConteudo = dados.descricaoConteudo();
+        this.pin = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        this.horarioExpiracao = LocalDateTime.now().plusHours(4);
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoAula dados) {
+        if (dados.data() != null) {
+            this.data = dados.data();
+        }
+        if (dados.descricaoConteudo() != null) {
+            this.descricaoConteudo = dados.descricaoConteudo();
+        }
     }
 
     public Long getId() {
