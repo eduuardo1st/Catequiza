@@ -1,5 +1,6 @@
 package com.catequiza.admin.domain;
 
+import com.catequiza.admin.controllers.dto.DadosAtualizacaoMatricula;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,16 @@ public class MatriculaTurma {
     private String statusMatricula;
 
     public MatriculaTurma() {
+    }
+
+    public MatriculaTurma(Catequizando catequizando, Turma turma, String statusMatricula) {
+        this.catequizando = catequizando;
+        this.turma = turma;
+        this.statusMatricula = statusMatricula;
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoMatricula dados) {
+        this.statusMatricula = dados.statusMatricula();
     }
 
     public Long getId() {
