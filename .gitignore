@@ -3,3 +3,13 @@
 .freebuff/desktop-v2.db-shm
 .freebuff/desktop-v2.db-wal
 .freebuff/project-id
+
+# Node / Frontend
+node_modules/
+dist/
+.DS_Store
+
+.agent/skills/impeccable/reference/adapt.md
+/.agent
+.impeccable/config.json
+PRODUCT.md
