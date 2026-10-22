@@ -1,6 +1,5 @@
 package com.catequiza.admin.security;
 
-import com.catequiza.admin.domain.Catequista;
 import com.catequiza.admin.repositories.CatequistaRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,12 +28,15 @@ public class SecurityFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String tokenJWT = recuperarToken(request);
         if (tokenJWT != null) {
-            String subject = tokenService.getSubject(tokenJWT);
-            Catequista catequista = catequistaRepository.findByEmail(subject)
-                    .orElseThrow(() -> new RuntimeException("Catequista nao encontrado para o email do token"));
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    catequista, null, Collections.emptyList());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                String subject = tokenService.getSubject(tokenJWT);
+                catequistaRepository.findByEmail(subject).ifPresent(catequista -> {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            catequista, null, Collections.emptyList());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                });
+            } catch (Exception ignored) {
+            }
         }
         filterChain.doFilter(request, response);
     }
