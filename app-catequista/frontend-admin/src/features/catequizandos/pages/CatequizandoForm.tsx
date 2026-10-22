@@ -84,7 +84,7 @@ export const CatequizandoForm: React.FC = () => {
       } else if (err.response?.status === 409) {
         setErro('Já existe um catequizando cadastrado com este CPF.');
       } else if (err.request && !err.response) {
-        setErro('Não foi possível conectar ao servidor backend (http://localhost:8080).');
+        setErro('Não foi possível conectar ao servidor backend. Verifique a conexão com a API.');
       } else {
         setErro('Ocorreu um erro ao salvar o catequizando.');
       }

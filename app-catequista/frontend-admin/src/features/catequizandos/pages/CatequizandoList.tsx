@@ -29,7 +29,7 @@ export const CatequizandoList: React.FC = () => {
       setCatequizandos(data);
     } catch (err: any) {
       if (err.request && !err.response) {
-        setErro('Não foi possível conectar ao backend local (http://localhost:8080).');
+        setErro('Não foi possível conectar à API do backend. Verifique sua conexão.');
       } else {
         setErro('Erro ao carregar a lista de catequizandos.');
       }

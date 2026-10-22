@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../../../lib/api';
 import { Church, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -33,7 +34,7 @@ export const Login: React.FC = () => {
           setErro(`Erro ao autenticar (${err.response.status}). Tente novamente.`);
         }
       } else if (err.request) {
-        setErro('Não foi possível conectar à API do backend (http://localhost:8080). Certifique-se de que o backend-admin está em execução.');
+        setErro(`Não foi possível conectar à API (${API_BASE_URL}). Se o servidor no Render estiver hibernando, pode levar até 1 minuto para acordar. Tente novamente.`);
       } else {
         setErro('Ocorreu um erro inesperado ao tentar realizar login.');
       }
@@ -46,7 +47,6 @@ export const Login: React.FC = () => {
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4 py-12">
       <div className="w-full max-w-md">
         
-        {/* Identidade Institucional */}
         <div className="text-center mb-8">
           <div className="inline-flex w-12 h-12 rounded-xl bg-parish-600 text-white items-center justify-center shadow-sm mb-3">
             <Church className="w-6 h-6" />
@@ -59,7 +59,6 @@ export const Login: React.FC = () => {
           </p>
         </div>
 
-        {/* Card do Formulário */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 sm:p-8 shadow-sm">
           
           <div className="mb-6">
@@ -69,7 +68,6 @@ export const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Mensagem de Erro Visual */}
           {erro && (
             <div className="mb-5 p-3.5 rounded-lg bg-red-950/40 border border-red-800/60 flex items-start gap-3 text-red-200 text-xs animate-fadeIn">
               <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
@@ -120,7 +118,7 @@ export const Login: React.FC = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Autenticando...</span>
+                  <span>Conectando à API...</span>
                 </>
               ) : (
                 <>

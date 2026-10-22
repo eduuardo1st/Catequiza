@@ -1,7 +1,11 @@
 import { Turma, Catequizando, FilaEsperaItem } from '../types';
 import { INITIAL_TURMAS, INITIAL_ALUNOS_TURMA_1, INITIAL_FILA_ESPERA } from './mockData';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_BACKEND_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://catequiza-backend-dev.onrender.com';
 
 // Gerenciamento de estado em memória com persistência local
 const STORAGE_KEY_TURMAS = 'catequiza_turmas_v1';
