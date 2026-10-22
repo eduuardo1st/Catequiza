@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { catequizandoService } from '../services/catequizandoService';
-import { ArrowLeft, Save, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ApiErrorAlert } from '../../../components/ApiErrorAlert';
+import { ArrowLeft, Save, Loader2, CheckCircle2 } from 'lucide-react';
 
 export const CatequizandoForm: React.FC = () => {
   const { matricula } = useParams<{ matricula: string }>();
@@ -15,7 +16,7 @@ export const CatequizandoForm: React.FC = () => {
 
   const [isLoadingDados, setIsLoadingDados] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
+  const [erro, setErro] = useState<any>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
 
   useEffect(() => {
@@ -77,16 +78,12 @@ export const CatequizandoForm: React.FC = () => {
         navigate('/catequizandos');
       }, 1200);
     } catch (err: any) {
-      if (err.response?.data?.message) {
-        setErro(err.response.data.message);
-      } else if (err.response?.status === 400) {
+      if (err.response?.status === 400) {
         setErro('Dados inválidos. Verifique o formato do CPF e e-mail.');
       } else if (err.response?.status === 409) {
         setErro('Já existe um catequizando cadastrado com este CPF.');
-      } else if (err.request && !err.response) {
-        setErro('Não foi possível conectar ao servidor backend. Verifique a conexão com a API.');
       } else {
-        setErro('Ocorreu um erro ao salvar o catequizando.');
+        setErro(err);
       }
     } finally {
       setIsSubmitting(false);
@@ -131,10 +128,7 @@ export const CatequizandoForm: React.FC = () => {
       )}
 
       {erro && (
-        <div className="p-4 rounded-lg bg-red-950/40 border border-red-800/60 text-red-200 text-xs flex items-center gap-2.5 animate-fadeIn">
-          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-          <span>{erro}</span>
-        </div>
+        <ApiErrorAlert error={erro} />
       )}
 
       <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm space-y-4">

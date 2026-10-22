@@ -2,13 +2,13 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { catequizandoService } from '../services/catequizandoService';
 import { DadosDetalhamentoCatequizando } from '../types/catequizando';
+import { ApiErrorAlert } from '../../../components/ApiErrorAlert';
 import { 
   UserPlus, 
   Search, 
   Edit2, 
   Trash2, 
   Loader2, 
-  AlertCircle, 
   CheckCircle2, 
   Users 
 } from 'lucide-react';
@@ -18,7 +18,7 @@ export const CatequizandoList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [busca, setBusca] = useState('');
   const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
+  const [erro, setErro] = useState<any>(null);
   const [excluindoMatricula, setExcluindoMatricula] = useState<number | null>(null);
 
   const carregarCatequizandos = async () => {
@@ -28,11 +28,7 @@ export const CatequizandoList: React.FC = () => {
       const data = await catequizandoService.listar();
       setCatequizandos(data);
     } catch (err: any) {
-      if (err.request && !err.response) {
-        setErro('Não foi possível conectar à API do backend. Verifique sua conexão.');
-      } else {
-        setErro('Erro ao carregar a lista de catequizandos.');
-      }
+      setErro(err);
     } finally {
       setIsLoading(false);
     }
@@ -113,10 +109,7 @@ export const CatequizandoList: React.FC = () => {
       )}
 
       {erro && (
-        <div className="p-4 rounded-lg bg-red-950/40 border border-red-800/60 text-red-200 text-xs flex items-center gap-2.5 animate-fadeIn">
-          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-          <span>{erro}</span>
-        </div>
+        <ApiErrorAlert error={erro} onRetry={carregarCatequizandos} />
       )}
 
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
