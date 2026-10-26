@@ -6,6 +6,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 
 import { CatequizandoList } from '../features/catequizandos/pages/CatequizandoList';
 import { CatequizandoForm } from '../features/catequizandos/pages/CatequizandoForm';
+import { TurmaList } from '../features/turmas/pages/TurmaList';
 
 const FeatureEmConstrucao: React.FC<{ titulo: string }> = ({ titulo }) => (
   <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center max-w-lg mx-auto my-12">
@@ -26,7 +27,7 @@ export const AppRoutes: React.FC = () => {
           <Route element={<AppLayout />}>
             <Route path="/" element={<Navigate to="/turmas" replace />} />
             
-            <Route path="/turmas/*" element={<FeatureEmConstrucao titulo="Módulo de Turmas" />} />
+            <Route path="/turmas" element={<TurmaList />} />
             
             <Route path="/catequizandos" element={<CatequizandoList />} />
             <Route path="/catequizandos/novo" element={<CatequizandoForm />} />
