@@ -83,7 +83,8 @@ export const api = {
             sala: stored[index % stored.length]?.sala || 'Sala de Catequese',
             bannerUrl: stored[index % stored.length]?.bannerUrl || INITIAL_TURMAS[0].bannerUrl,
             totalAlunos: stored[index % stored.length]?.totalAlunos || 20,
-            aulaAtiva: stored[index % stored.length]?.aulaAtiva || null
+            aulaAtiva: stored[index % stored.length]?.aulaAtiva || null,
+            aulasHistorico: stored[index % stored.length]?.aulasHistorico || INITIAL_TURMAS[index % INITIAL_TURMAS.length]?.aulasHistorico || []
           }));
         }
       }
@@ -151,7 +152,34 @@ export const api = {
   },
 
   // Buscar alunos da turma
-  async getAlunosTurma(_turmaId: number): Promise<Catequizando[]> {
+  async getAlunosTurma(turmaId: number): Promise<Catequizando[]> {
+    try {
+      const res = await fetch(`${BASE_URL}/catequizandos`, {
+        headers: {
+          'Authorization': `Bearer ${this.getToken()}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return data.map((c: any, index: number) => ({
+            matricula: c.matricula || (10000 + index),
+            nome: c.nome,
+            cpf: c.cpf,
+            telefone: c.telefone || '(11) 98765-4321',
+            email: c.email || 'aluno@email.com',
+            statusMatricula: 'ATIVA',
+            presencaNaAula: (index + turmaId) % 3 !== 0,
+            origemPresenca: (index + turmaId) % 3 === 0 ? 'NENHUMA' : 'PIN',
+            totalFaltas: (index + turmaId * 2) % 6,
+            totalPresencas: 7 + ((index + turmaId) % 4),
+            limiteFaltas: 5
+          }));
+        }
+      }
+    } catch {
+      // fallback
+    }
     return INITIAL_ALUNOS_TURMA_1;
   },
 

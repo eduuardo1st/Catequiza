@@ -1,21 +1,22 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { api } from '../../../services/api';
 import { turmaService } from '../services/turmaService';
-import { DadosDetalhamentoTurma } from '../types/turma';
+import { Turma } from '../../../types';
 import { NovaTurmaModal } from '../components/NovaTurmaModal';
+import { TurmaCard } from '../../../components/TurmaCard';
+import { TurmaPaginaView } from '../../../components/TurmaPaginaView';
 import { ApiErrorAlert } from '../../../components/ApiErrorAlert';
 import { 
   Plus, 
   Search, 
-  Calendar, 
-  Trash2, 
   Loader2, 
   GraduationCap,
-  Layers,
-  Sparkles
+  Layers
 } from 'lucide-react';
 
 export const TurmaList: React.FC = () => {
-  const [turmas, setTurmas] = useState<DadosDetalhamentoTurma[]>([]);
+  const [turmas, setTurmas] = useState<Turma[]>([]);
+  const [turmaSelecionada, setTurmaSelecionada] = useState<Turma | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [busca, setBusca] = useState('');
   const [anoFiltro, setAnoFiltro] = useState<string>('TODOS');
@@ -27,7 +28,7 @@ export const TurmaList: React.FC = () => {
     setIsLoading(true);
     setErro(null);
     try {
-      const data = await turmaService.listar();
+      const data = await api.getTurmas();
       setTurmas(data);
     } catch (err: any) {
       setErro(err);
@@ -40,6 +41,13 @@ export const TurmaList: React.FC = () => {
     carregarTurmas();
   }, []);
 
+  const handleTurmaUpdate = (turmaAtualizada: Turma) => {
+    setTurmas((prev) =>
+      prev.map((t) => (t.id === turmaAtualizada.id ? turmaAtualizada : t))
+    );
+    setTurmaSelecionada(turmaAtualizada);
+  };
+
   const handleExcluir = async (id: number, nome: string) => {
     const confirmou = window.confirm(
       `Deseja realmente excluir a turma "${nome}"? Esta ação removerá a turma do banco de dados.`
@@ -51,6 +59,9 @@ export const TurmaList: React.FC = () => {
     try {
       await turmaService.excluir(id);
       setTurmas((prev) => prev.filter((t) => t.id !== id));
+      if (turmaSelecionada?.id === id) {
+        setTurmaSelecionada(null);
+      }
     } catch (err: any) {
       setErro(err);
     } finally {
@@ -70,13 +81,25 @@ export const TurmaList: React.FC = () => {
         !termo ||
         t.nomeTurma.toLowerCase().includes(termo) ||
         t.id.toString().includes(termo) ||
-        t.anoLetivo.toString().includes(termo);
+        t.anoLetivo.toString().includes(termo) ||
+        (t.catequistaNome && t.catequistaNome.toLowerCase().includes(termo)) ||
+        (t.sacramento && t.sacramento.toLowerCase().includes(termo));
 
       const matchesAno = anoFiltro === 'TODOS' || t.anoLetivo.toString() === anoFiltro;
 
       return matchesBusca && matchesAno;
     });
   }, [turmas, busca, anoFiltro]);
+
+  if (turmaSelecionada) {
+    return (
+      <TurmaPaginaView
+        turma={turmaSelecionada}
+        onVoltar={() => setTurmaSelecionada(null)}
+        onTurmaUpdate={handleTurmaUpdate}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -87,7 +110,7 @@ export const TurmaList: React.FC = () => {
             <span>Turmas Pastorais</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Gestão das turmas de catequese, encontros e sacramentos da paróquia
+            Selecione uma turma para ver alunos, histórico de encontros, faltas e chamada por PIN
           </p>
         </div>
 
@@ -109,7 +132,7 @@ export const TurmaList: React.FC = () => {
             type="text"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por nome da turma ou ano letivo..."
+            placeholder="Buscar por nome da turma, sacramento, catequista ou ano..."
             className="w-full bg-transparent border-none text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none"
           />
         </div>
@@ -162,53 +185,13 @@ export const TurmaList: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {turmasFiltradas.map((turma) => (
-              <div
+              <TurmaCard
                 key={turma.id}
-                className="group relative bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-parish-500/60 rounded-2xl p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-1 text-[11px] font-semibold tracking-wide uppercase rounded-md bg-parish-900/60 text-parish-300 border border-parish-700/40">
-                      Ano {turma.anoLetivo}
-                    </span>
-                    <span className="text-[11px] font-mono text-slate-500">
-                      ID #{turma.id}
-                    </span>
-                  </div>
-
-                  <h3 className="font-heading font-bold text-base text-white group-hover:text-parish-300 transition-colors">
-                    {turma.nomeTurma}
-                  </h3>
-
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-parish-400" />
-                      <span>Ciclo {turma.anoLetivo}</span>
-                    </span>
-                    <span>Catequista #{turma.idCatequista}</span>
-                  </div>
-                </div>
-
-                <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Turma Ativa</span>
-                  </span>
-
-                  <button
-                    onClick={() => handleExcluir(turma.id, turma.nomeTurma)}
-                    disabled={excluindoId === turma.id}
-                    className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
-                    title="Excluir turma"
-                  >
-                    {excluindoId === turma.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-red-400" />
-                    ) : (
-                      <Trash2 className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
+                turma={turma}
+                onOpen={(t) => setTurmaSelecionada(t)}
+                onDelete={handleExcluir}
+                isDeleting={excluindoId === turma.id}
+              />
             ))}
           </div>
         )}
