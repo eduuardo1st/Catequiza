@@ -7,6 +7,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { CatequizandoList } from '../features/catequizandos/pages/CatequizandoList';
 import { CatequizandoForm } from '../features/catequizandos/pages/CatequizandoForm';
 import { TurmaList } from '../features/turmas/pages/TurmaList';
+import { MatriculaList } from '../features/matriculas/pages/MatriculaList';
 
 const FeatureEmConstrucao: React.FC<{ titulo: string }> = ({ titulo }) => (
   <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center max-w-lg mx-auto my-12">
@@ -33,7 +34,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/catequizandos/novo" element={<CatequizandoForm />} />
             <Route path="/catequizandos/:matricula/editar" element={<CatequizandoForm />} />
 
-            <Route path="/matriculas/*" element={<FeatureEmConstrucao titulo="Módulo de Matrículas" />} />
+            <Route path="/matriculas" element={<MatriculaList />} />
             <Route path="/aulas/*" element={<FeatureEmConstrucao titulo="Módulo de Aulas & PIN" />} />
             <Route path="/fila-espera/*" element={<FeatureEmConstrucao titulo="Módulo de Fila de Espera" />} />
           </Route>
