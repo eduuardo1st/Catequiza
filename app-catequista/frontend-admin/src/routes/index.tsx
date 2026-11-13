@@ -8,15 +8,9 @@ import { CatequizandoList } from '../features/catequizandos/pages/CatequizandoLi
 import { CatequizandoForm } from '../features/catequizandos/pages/CatequizandoForm';
 import { TurmaList } from '../features/turmas/pages/TurmaList';
 import { MatriculaList } from '../features/matriculas/pages/MatriculaList';
+import { AulaList } from '../features/aulas/pages/AulaList';
+import { FilaEsperaList } from '../features/fila-espera/pages/FilaEsperaList';
 
-const FeatureEmConstrucao: React.FC<{ titulo: string }> = ({ titulo }) => (
-  <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center max-w-lg mx-auto my-12">
-    <h2 className="text-lg font-bold text-white mb-2">{titulo}</h2>
-    <p className="text-xs text-slate-400">
-      Módulo pronto para ser implementado consumindo o endpoint correspondente do backend.
-    </p>
-  </div>
-);
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -35,8 +29,9 @@ export const AppRoutes: React.FC = () => {
             <Route path="/catequizandos/:matricula/editar" element={<CatequizandoForm />} />
 
             <Route path="/matriculas" element={<MatriculaList />} />
-            <Route path="/aulas/*" element={<FeatureEmConstrucao titulo="Módulo de Aulas & PIN" />} />
-            <Route path="/fila-espera/*" element={<FeatureEmConstrucao titulo="Módulo de Fila de Espera" />} />
+            <Route path="/aulas" element={<AulaList />} />
+            <Route path="/fila-espera" element={<FilaEsperaList />} />
+            <Route path="/fila-espera/*" element={<FilaEsperaList />} />
           </Route>
         </Route>
 
