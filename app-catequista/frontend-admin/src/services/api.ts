@@ -19,9 +19,9 @@ const STORAGE_OVERRIDES_CHAMADA = 'catequiza_chamadas_overrides_v2';
 const STORAGE_AULAS_ENCERRADAS = 'catequiza_aulas_encerradas_v2';
 
 const BANNERS_SACRAMENTO: Record<Sacramento, string> = {
-  '1ª Eucaristia': 'https://images.unsplash.com/photo-1548625361-16800b32f017?auto=format&fit=crop&w=900&q=80',
+  '1ª Eucaristia': 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=900&q=80',
   'Crisma': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=900&q=80',
-  'Batismo': 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80',
+  'Batismo': 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=900&q=80',
   'Perseverança': 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=900&q=80',
   'Adultos': 'https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=900&q=80',
 };

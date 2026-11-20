@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Turma } from '../types';
-import { Users, Clock, MapPin, Radio, KeyRound, Trash2, Loader2 } from 'lucide-react';
+import { Users, Clock, MapPin, Radio, KeyRound, Trash2, Loader2, Church } from 'lucide-react';
 
 interface TurmaCardProps {
   turma: Turma;
@@ -11,6 +11,7 @@ interface TurmaCardProps {
 
 export const TurmaCard: React.FC<TurmaCardProps> = ({ turma, onOpen, onDelete, isDeleting }) => {
   const isAulaAtiva = !!turma.aulaAtiva;
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div
@@ -18,12 +19,19 @@ export const TurmaCard: React.FC<TurmaCardProps> = ({ turma, onOpen, onDelete, i
       className="group relative bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-parish-500/60 rounded-xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col"
     >
       <div className="relative h-40 w-full overflow-hidden bg-slate-950">
-        <img
-          src={turma.bannerUrl}
-          alt={turma.nomeTurma}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
-          loading="lazy"
-        />
+        {!imgError && turma.bannerUrl ? (
+          <img
+            src={turma.bannerUrl}
+            alt={turma.nomeTurma}
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-parish-950 via-slate-900 to-slate-950 flex items-center justify-center">
+            <Church className="w-12 h-12 text-parish-500/30" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2 items-center">
