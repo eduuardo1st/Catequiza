@@ -1,9 +1,14 @@
 import { api } from '../../../lib/api';
-import { FilaEsperaItem, AtualizarFilaDTO } from '../types/filaEspera';
+import { FilaEsperaItem, AtualizarFilaDTO, CadastrarFilaDTO } from '../types/filaEspera';
 
 export const filaEsperaService = {
   async listar(): Promise<FilaEsperaItem[]> {
     const response = await api.get<FilaEsperaItem[]>('/fila-espera');
+    return response.data;
+  },
+
+  async cadastrar(dados: CadastrarFilaDTO): Promise<FilaEsperaItem> {
+    const response = await api.post<FilaEsperaItem>('/fila-espera', dados);
     return response.data;
   },
 

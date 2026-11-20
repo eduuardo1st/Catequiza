@@ -1,12 +1,12 @@
 package com.catequiza.admin.controllers;
 
-import com.catequiza.admin.controllers.dto.DadosCadastroTurma;
 import com.catequiza.admin.controllers.dto.DadosAtualizacaoTurma;
+import com.catequiza.admin.controllers.dto.DadosCadastroTurma;
 import com.catequiza.admin.controllers.dto.DadosDetalhamentoTurma;
-import com.catequiza.admin.domain.Catequista;
 import com.catequiza.admin.domain.Turma;
 import com.catequiza.admin.repositories.CatequistaRepository;
 import com.catequiza.admin.repositories.TurmaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +35,10 @@ public class TurmaController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<DadosDetalhamentoTurma> cadastrar(@RequestBody @Valid DadosCadastroTurma dados, UriComponentsBuilder uriBuilder) {
         var catequista = catequistaRepository.findById(dados.idCatequista())
-                .orElseThrow(() -> new RuntimeException("Catequista não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Catequista não encontrado com ID " + dados.idCatequista()));
 
         var turma = new Turma(dados, catequista);
         turmaRepository.save(turma);
@@ -54,19 +55,22 @@ public class TurmaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DadosDetalhamentoTurma> detalhar(@PathVariable Long id) {
-        var turma = turmaRepository.getReferenceById(id);
+        var turma = turmaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Turma não encontrada com ID " + id));
         return ResponseEntity.ok(new DadosDetalhamentoTurma(turma));
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity<DadosDetalhamentoTurma> atualizar(@RequestBody @Valid DadosAtualizacaoTurma dados) {
-        var turma = turmaRepository.getReferenceById(dados.id());
+        var turma = turmaRepository.findById(dados.id())
+                .orElseThrow(() -> new EntityNotFoundException("Turma não encontrada com ID " + dados.id()));
         turma.atualizarInformacoes(dados);
         return ResponseEntity.ok(new DadosDetalhamentoTurma(turma));
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         turmaRepository.deleteById(id);
         return ResponseEntity.noContent().build();

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { turmaService } from '../services/turmaService';
+import React, { useState, useEffect } from 'react';
+import { turmaService, CATEQUISTAS_PADRAO } from '../services/turmaService';
+import { DadosDetalhamentoCatequista } from '../types/turma';
 import { ApiErrorAlert } from '../../../components/ApiErrorAlert';
 import { X, Layers, Calendar, User, Loader2, Save } from 'lucide-react';
 
@@ -18,8 +19,20 @@ export const NovaTurmaModal: React.FC<NovaTurmaModalProps> = ({
   const [nomeTurma, setNomeTurma] = useState('');
   const [anoLetivo, setAnoLetivo] = useState<number>(anoAtual);
   const [idCatequista, setIdCatequista] = useState<number>(1);
+  const [catequistas, setCatequistas] = useState<DadosDetalhamentoCatequista[]>(CATEQUISTAS_PADRAO);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [erro, setErro] = useState<any>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      turmaService.listarCatequistas().then((lista) => {
+        setCatequistas(lista);
+        if (lista.length > 0 && !lista.some((c) => c.id === idCatequista)) {
+          setIdCatequista(lista[0].id);
+        }
+      });
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -114,16 +127,20 @@ export const NovaTurmaModal: React.FC<NovaTurmaModalProps> = ({
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-parish-400" />
-                <span>ID do Catequista *</span>
+                <span>Catequista Responsável *</span>
               </label>
-              <input
-                type="number"
+              <select
                 value={idCatequista}
                 onChange={(e) => setIdCatequista(Number(e.target.value))}
-                min={1}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
+                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-xs sm:text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
                 required
-              />
+              >
+                {catequistas.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.nome} (#{cat.id})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

@@ -1,10 +1,11 @@
 package com.catequiza.admin.controllers;
 
-import com.catequiza.admin.controllers.dto.DadosCadastroCatequizando;
 import com.catequiza.admin.controllers.dto.DadosAtualizacaoCatequizando;
+import com.catequiza.admin.controllers.dto.DadosCadastroCatequizando;
 import com.catequiza.admin.controllers.dto.DadosDetalhamentoCatequizando;
 import com.catequiza.admin.domain.Catequizando;
 import com.catequiza.admin.repositories.CatequizandoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ public class CatequizandoController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<DadosDetalhamentoCatequizando> cadastrar(@RequestBody @Valid DadosCadastroCatequizando dados, UriComponentsBuilder uriBuilder) {
         Catequizando catequizando = new Catequizando(dados);
         repository.save(catequizando);
@@ -47,19 +49,22 @@ public class CatequizandoController {
 
     @GetMapping("/{matricula}")
     public ResponseEntity<DadosDetalhamentoCatequizando> detalhar(@PathVariable Long matricula) {
-        var catequizando = repository.getReferenceById(matricula);
+        var catequizando = repository.findById(matricula)
+                .orElseThrow(() -> new EntityNotFoundException("Catequizando não encontrado com matrícula " + matricula));
         return ResponseEntity.ok(new DadosDetalhamentoCatequizando(catequizando));
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity<DadosDetalhamentoCatequizando> atualizar(@RequestBody @Valid DadosAtualizacaoCatequizando dados) {
-        var catequizando = repository.getReferenceById(dados.matricula());
+        var catequizando = repository.findById(dados.matricula())
+                .orElseThrow(() -> new EntityNotFoundException("Catequizando não encontrado com matrícula " + dados.matricula()));
         catequizando.atualizarInformacoes(dados);
         return ResponseEntity.ok(new DadosDetalhamentoCatequizando(catequizando));
     }
 
     @DeleteMapping("/{matricula}")
+    @Transactional
     public ResponseEntity<Void> excluir(@PathVariable Long matricula) {
         repository.deleteById(matricula);
         return ResponseEntity.noContent().build();

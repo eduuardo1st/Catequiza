@@ -47,7 +47,15 @@ public class Aula {
         this.data = dados.data();
         this.descricaoConteudo = dados.descricaoConteudo();
         this.pin = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        this.horarioExpiracao = LocalDateTime.now().plusHours(4);
+        if (dados.minutosValidade() != null && dados.minutosValidade() > 0) {
+            this.horarioExpiracao = LocalDateTime.now().plusMinutes(dados.minutosValidade());
+        } else {
+            this.horarioExpiracao = LocalDateTime.now().plusHours(4);
+        }
+    }
+
+    public void encerrarSessao() {
+        this.horarioExpiracao = LocalDateTime.now().minusSeconds(1);
     }
 
     public void atualizarInformacoes(DadosAtualizacaoAula dados) {

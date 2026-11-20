@@ -16,4 +16,12 @@ export interface DadosDetalhamentoTurma {
   idCatequista: number;
   nomeTurma: string;
   anoLetivo: number;
+  nomeCatequista?: string;
+}
+
+export interface DadosDetalhamentoCatequista {
+  id: number;
+  nome: string;
+  email: string;
+  telefone?: string;
 }

@@ -36,6 +36,13 @@ public class FilaEspera {
     public FilaEspera() {
     }
 
+    public FilaEspera(Catequizando catequizando, String sacramentoDesejado) {
+        this.catequizando = catequizando;
+        this.sacramentoDesejado = sacramentoDesejado;
+        this.dataSolicitacao = LocalDate.now();
+        this.status = "PENDENTE";
+    }
+
     public void atualizarStatus(DadosAtualizacaoFila dados) {
         this.status = dados.status();
     }

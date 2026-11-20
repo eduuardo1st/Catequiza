@@ -33,6 +33,12 @@ public class Chamada {
     public Chamada() {
     }
 
+    public Chamada(Aula aula, Catequizando catequizando, Boolean presente) {
+        this.aula = aula;
+        this.catequizando = catequizando;
+        this.presente = presente != null ? presente : Boolean.TRUE;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,12 +1,13 @@
 package com.catequiza.admin.controllers;
 
-import com.catequiza.admin.controllers.dto.DadosCadastroMatricula;
 import com.catequiza.admin.controllers.dto.DadosAtualizacaoMatricula;
+import com.catequiza.admin.controllers.dto.DadosCadastroMatricula;
 import com.catequiza.admin.controllers.dto.DadosDetalhamentoMatricula;
 import com.catequiza.admin.domain.MatriculaTurma;
 import com.catequiza.admin.repositories.CatequizandoRepository;
 import com.catequiza.admin.repositories.MatriculaTurmaRepository;
 import com.catequiza.admin.repositories.TurmaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,13 @@ public class MatriculaController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<DadosDetalhamentoMatricula> cadastrar(@RequestBody @Valid DadosCadastroMatricula dados, UriComponentsBuilder uriBuilder) {
         var catequizando = catequizandoRepository.findById(dados.matriculaCatequizando())
-                .orElseThrow(() -> new RuntimeException("Catequizando não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Catequizando não encontrado com matrícula " + dados.matriculaCatequizando()));
 
         var turma = turmaRepository.findById(dados.idTurma())
-                .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Turma não encontrada com ID " + dados.idTurma()));
 
         var matricula = new MatriculaTurma(catequizando, turma, dados.statusMatricula());
         matriculaTurmaRepository.save(matricula);
@@ -59,19 +61,22 @@ public class MatriculaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DadosDetalhamentoMatricula> detalhar(@PathVariable Long id) {
-        var matricula = matriculaTurmaRepository.getReferenceById(id);
+        var matricula = matriculaTurmaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Matrícula não encontrada com ID " + id));
         return ResponseEntity.ok(new DadosDetalhamentoMatricula(matricula));
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity<DadosDetalhamentoMatricula> atualizar(@RequestBody @Valid DadosAtualizacaoMatricula dados) {
-        var matricula = matriculaTurmaRepository.getReferenceById(dados.id());
+        var matricula = matriculaTurmaRepository.findById(dados.id())
+                .orElseThrow(() -> new EntityNotFoundException("Matrícula não encontrada com ID " + dados.id()));
         matricula.atualizarInformacoes(dados);
         return ResponseEntity.ok(new DadosDetalhamentoMatricula(matricula));
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         matriculaTurmaRepository.deleteById(id);
         return ResponseEntity.noContent().build();

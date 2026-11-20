@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Turma, Catequizando } from '../types';
 import { api } from '../services/api';
 import { TurmaAlunosTab } from './TurmaAlunosTab';
 import { TurmaHistoricoTab } from './TurmaHistoricoTab';
-import { 
-  ArrowLeft, 
-  Sparkles, 
-  Users, 
-  BookOpen, 
-  Radio, 
-  Clock, 
-  Play, 
-  Square, 
-  Copy, 
-  Check, 
-  CheckCircle2, 
-  XCircle, 
+import {
+  ArrowLeft,
+  Sparkles,
+  Users,
+  BookOpen,
+  Radio,
+  Clock,
+  Play,
+  Square,
+  Copy,
+  Check,
+  CheckCircle2,
+  XCircle,
   RefreshCw,
   MapPin,
-  UserCheck
+  UserCheck,
 } from 'lucide-react';
 
 interface TurmaPaginaViewProps {
@@ -30,49 +30,57 @@ interface TurmaPaginaViewProps {
 export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
   turma,
   onVoltar,
-  onTurmaUpdate
+  onTurmaUpdate,
 }) => {
-  // Aba ativa na página: AULA_DIA | ALUNOS | HISTORICO
   const [secaoAtiva, setSecaoAtiva] = useState<'AULA_DIA' | 'ALUNOS' | 'HISTORICO'>('AULA_DIA');
-  
+
   const [alunos, setAlunos] = useState<Catequizando[]>([]);
   const [loadingAlunos, setLoadingAlunos] = useState(true);
   const [copiedPin, setCopiedPin] = useState(false);
-  const [descricaoAula, setDescricaoAula] = useState("Tema do Encontro Paroquial");
-  const [minutosValidade, setMinutosValidade] = useState(45);
+  const [descricaoAula, setDescricaoAula] = useState('Tema do Encontro Paroquial');
+  const [minutosValidade, setMinutosValidade] = useState(60);
   const [tempoRestante, setTempoRestante] = useState<string>('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Carregar lista de catequizandos
-  useEffect(() => {
-    let mounted = true;
-    api.getAlunosTurma(turma.id).then(data => {
-      if (mounted) {
-        setAlunos(data);
-        setLoadingAlunos(false);
-      }
-    });
-    return () => { mounted = false; };
+  const carregarAlunos = useCallback(async () => {
+    setLoadingAlunos(true);
+    try {
+      const data = await api.getAlunosTurma(turma.id);
+      setAlunos(data);
+    } finally {
+      setLoadingAlunos(false);
+    }
   }, [turma.id]);
+
+  useEffect(() => {
+    carregarAlunos();
+  }, [carregarAlunos]);
 
   // Atualizar contador regressivo de tempo do PIN
   useEffect(() => {
     if (!turma.aulaAtiva?.horarioExpiracao) return;
 
-    const interval = setInterval(() => {
+    const atualizarRelogio = () => {
       const expira = new Date(turma.aulaAtiva!.horarioExpiracao).getTime();
-      const agora = new Date().getTime();
+      const agora = Date.now();
       const diff = expira - agora;
 
       if (diff <= 0) {
         setTempoRestante('PIN Expirado');
       } else {
+        const hrs = Math.floor(diff / (1000 * 60 * 60));
         const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const secs = Math.floor((diff % (1000 * 60)) / 1000);
-        setTempoRestante(`${mins}m ${secs < 10 ? '0' : ''}${secs}s restantes`);
+        if (hrs > 0) {
+          setTempoRestante(`${hrs}h ${mins}m ${secs < 10 ? '0' : ''}${secs}s restantes`);
+        } else {
+          setTempoRestante(`${mins}m ${secs < 10 ? '0' : ''}${secs}s restantes`);
+        }
       }
-    }, 1000);
+    };
 
+    atualizarRelogio();
+    const interval = setInterval(atualizarRelogio, 1000);
     return () => clearInterval(interval);
   }, [turma.aulaAtiva?.horarioExpiracao]);
 
@@ -82,6 +90,7 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
     try {
       const updated = await api.iniciarAula(turma.id, descricaoAula, minutosValidade);
       onTurmaUpdate(updated);
+      await carregarAlunos();
     } finally {
       setActionLoading(false);
     }
@@ -89,11 +98,12 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
 
   // Encerrar aula
   const handleEncerrarAula = async () => {
-    if (!window.confirm("Deseja encerrar a sessão de chamada desta turma?")) return;
+    if (!window.confirm('Deseja encerrar a sessão de chamada desta turma?')) return;
     setActionLoading(true);
     try {
-      const updated = await api.encerrarAula(turma.id);
+      const updated = await api.encerrarAula(turma.id, turma.aulaAtiva?.id);
       onTurmaUpdate(updated);
+      await carregarAlunos();
     } finally {
       setActionLoading(false);
     }
@@ -107,28 +117,49 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
     setTimeout(() => setCopiedPin(false), 2000);
   };
 
-  // Alternar presença manual do aluno
+  // Alternar presença manual do aluno e persistir no backend
   const handleTogglePresenca = async (aluno: Catequizando) => {
     const novoStatus = !aluno.presencaNaAula;
-    setAlunos(prev => prev.map(a => {
-      if (a.matricula === aluno.matricula) {
-        return {
-          ...a,
-          presencaNaAula: novoStatus,
-          origemPresenca: novoStatus ? 'MANUAL' : 'NENHUMA'
-        };
+    const aulaIdAlvo =
+      turma.aulaAtiva?.id ||
+      (turma.aulasHistorico && turma.aulasHistorico.length > 0
+        ? turma.aulasHistorico[0].id
+        : null);
+
+    setAlunos((prev) =>
+      prev.map((a) => {
+        if (a.matricula === aluno.matricula) {
+          const deltaPresenca = novoStatus ? 1 : -1;
+          const deltaFalta = novoStatus ? -1 : 1;
+          return {
+            ...a,
+            presencaNaAula: novoStatus,
+            origemPresenca: novoStatus ? 'MANUAL' : 'NENHUMA',
+            totalPresencas: Math.max(0, (a.totalPresencas || 0) + deltaPresenca),
+            totalFaltas: Math.max(0, (a.totalFaltas || 0) + deltaFalta),
+          };
+        }
+        return a;
+      })
+    );
+
+    if (aulaIdAlvo) {
+      await api.togglePresenca(aulaIdAlvo, aluno.matricula, novoStatus);
+      const turmasAtualizadas = await api.getTurmas();
+      const turmaAtualizada = turmasAtualizadas.find((t) => t.id === turma.id);
+      if (turmaAtualizada) {
+        onTurmaUpdate(turmaAtualizada);
       }
-      return a;
-    }));
+    }
   };
 
-  const totalPresentes = alunos.filter(a => a.presencaNaAula).length;
-  const percentualPresenca = alunos.length > 0 ? Math.round((totalPresentes / alunos.length) * 100) : 0;
+  const totalPresentes = alunos.filter((a) => a.presencaNaAula).length;
+  const percentualPresenca =
+    alunos.length > 0 ? Math.round((totalPresentes / alunos.length) * 100) : 0;
   const totalAulasHistorico = turma.aulasHistorico?.length || 0;
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
-      
       {/* 1. Header com Navegação e Breadcrumb */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -145,9 +176,7 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
               <span className="px-2.5 py-0.5 text-xs font-semibold rounded-md bg-parish-900/90 text-parish-200 border border-parish-700/40">
                 {turma.sacramento}
               </span>
-              <span className="text-xs text-slate-400">
-                Ano Letivo {turma.anoLetivo}
-              </span>
+              <span className="text-xs text-slate-400">Ano Letivo {turma.anoLetivo}</span>
               {turma.aulaAtiva && (
                 <span className="px-2.5 py-0.5 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
                   <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
@@ -179,14 +208,15 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
           <div className="flex items-center gap-2 sm:self-start">
             <div className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-right">
               <div className="text-[10px] text-slate-400 uppercase font-medium">Catequizandos</div>
-              <div className="font-heading font-bold text-lg text-white">{alunos.length} matriculados</div>
+              <div className="font-heading font-bold text-lg text-white">
+                {alunos.length} matriculados
+              </div>
             </div>
           </div>
         </div>
 
         {/* 2. Seletores de Seção por Blocos/Cards de Topo */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-800">
-          
           {/* Card 1: Aula de Hoje */}
           <button
             onClick={() => setSecaoAtiva('AULA_DIA')}
@@ -255,18 +285,17 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
               Temas abordados e alunos que faltaram
             </div>
           </button>
-
         </div>
       </div>
 
       {/* 3. Conteúdo Dinâmico do Card Selecionado */}
-      
+
       {/* SEÇÃO 1: AULA DO DIA & CHAMADA */}
       {secaoAtiva === 'AULA_DIA' && (
         <div className="space-y-6 animate-fadeIn">
           {turma.aulaAtiva ? (
             /* Card de Aula Ativa / Projeção do PIN */
-            <div className="bg-gradient-to-b from-parish-950/70 via-slate-900 to-slate-900 border-2 border-parish-500/50 rounded-2xl p-6 sm:p-8 shadow-glow relative overflow-hidden">
+            <div className="bg-slate-900 border-2 border-parish-500/50 rounded-2xl p-6 sm:p-8 shadow-glow relative overflow-hidden">
               <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
                 <div className="flex items-center gap-2">
                   <span className="relative flex h-3.5 w-3.5">
@@ -299,7 +328,7 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                 <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">
                   Código PIN de Presença do Aluno
                 </div>
-                <div className="font-heading text-6xl sm:text-8xl font-extrabold tracking-[0.25em] text-parish-300 drop-shadow-[0_0_25px_rgba(14,134,229,0.35)]">
+                <div className="font-heading text-6xl sm:text-8xl font-extrabold tracking-[0.2em] text-parish-300">
                   {turma.aulaAtiva.pin}
                 </div>
                 <div className="mt-4 flex items-center justify-center gap-3">
@@ -307,7 +336,11 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                     onClick={handleCopyPin}
                     className="flex items-center gap-2 px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-colors"
                   >
-                    {copiedPin ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    {copiedPin ? (
+                      <Check className="w-4 h-4 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
                     <span>{copiedPin ? 'PIN Copiado!' : 'Copiar PIN'}</span>
                   </button>
                 </div>
@@ -319,7 +352,8 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                   Tema: {turma.aulaAtiva.descricao || 'Encontro em andamento'}
                 </span>
                 <span className="font-semibold text-parish-300">
-                  {totalPresentes} de {alunos.length} catequizandos registraram presença ({percentualPresenca}%)
+                  {totalPresentes} de {alunos.length} catequizandos registraram presença (
+                  {percentualPresenca}%)
                 </span>
               </div>
             </div>
@@ -333,7 +367,9 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                 </h3>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 mb-6 max-w-2xl">
-                Ao iniciar o encontro, o sistema gerará um PIN de 4 dígitos com tempo limite. Os catequizandos poderão digitar esse PIN pelo smartphone para registrar presença automaticamente.
+                Ao iniciar o encontro, o sistema gerará um código PIN exclusivo com tempo limite.
+                Os catequizandos poderão digitar esse PIN pelo smartphone para registrar presença
+                automaticamente.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -361,7 +397,8 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                     <option value={30}>30 minutos</option>
                     <option value={45}>45 minutos</option>
                     <option value={60}>60 minutos (1 hora)</option>
-                    <option value={90}>90 minutos</option>
+                    <option value={120}>120 minutos (2 horas)</option>
+                    <option value={240}>240 minutos (4 horas)</option>
                   </select>
                 </div>
               </div>
@@ -369,7 +406,7 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
               <button
                 onClick={handleIniciarAula}
                 disabled={actionLoading}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-parish-600 to-parish-500 hover:from-parish-500 hover:to-parish-400 text-white font-semibold text-sm shadow-md shadow-parish-900/50 flex items-center gap-2.5 transition-all"
+                className="px-6 py-3 rounded-xl bg-parish-600 hover:bg-parish-500 text-white font-semibold text-sm shadow-md flex items-center gap-2.5 transition-all disabled:opacity-50"
               >
                 <Play className="w-4 h-4 fill-current" />
                 <span>{actionLoading ? 'Gerando Sessão...' : 'Iniciar Encontro & Gerar PIN'}</span>
@@ -377,28 +414,34 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
             </div>
           )}
 
-          {/* Lista de Chamada em Tempo Real do Encontro de Hoje */}
+          {/* Lista de Chamada em Tempo Real do Encontro */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-card">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-heading font-bold text-base text-white flex items-center gap-2">
                   <Users className="w-4 h-4 text-parish-400" />
-                  Presenças no Encontro de Hoje
+                  {turma.aulaAtiva
+                    ? 'Presenças no Encontro Ao Vivo'
+                    : 'Lista de Presença do Último Encontro'}
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  {totalPresentes} presentes • {alunos.length - totalPresentes} ausentes
+                  {totalPresentes} presentes • {Math.max(0, alunos.length - totalPresentes)} ausentes
                 </p>
               </div>
 
               <div className="text-xs text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hidden sm:block">
-                Toque no botão para alternar presença manual
+                Clique em Presente / Falta para registrar ou ajustar a chamada
               </div>
             </div>
 
             {loadingAlunos ? (
               <div className="text-center py-12 text-slate-400 text-xs flex items-center justify-center gap-2">
                 <RefreshCw className="w-4 h-4 animate-spin text-parish-400" />
-                Carregando alunos...
+                Carregando catequizandos da turma...
+              </div>
+            ) : alunos.length === 0 ? (
+              <div className="text-center py-12 bg-slate-950/40 border border-slate-800 rounded-xl text-slate-400 text-xs">
+                Nenhum catequizando matriculado nesta turma até o momento.
               </div>
             ) : (
               <div className="border border-slate-800 rounded-xl overflow-hidden divide-y divide-slate-800 bg-slate-950/60">
@@ -421,7 +464,18 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                           )}
                         </div>
                         <div className="text-xs text-slate-500 mt-0.5">
-                          Matrícula: #{aluno.matricula} • CPF: {aluno.cpf}
+                          Matrícula: #{aluno.matricula} • CPF: {aluno.cpf} • Faltas no ano:{' '}
+                          <strong
+                            className={
+                              aluno.totalFaltas >= 5
+                                ? 'text-red-400'
+                                : aluno.totalFaltas >= 3
+                                ? 'text-amber-400'
+                                : 'text-emerald-400'
+                            }
+                          >
+                            {aluno.totalFaltas}
+                          </strong>
                         </div>
                       </div>
 
@@ -468,7 +522,6 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
           <TurmaHistoricoTab aulas={turma.aulasHistorico || []} turmaNome={turma.nomeTurma} />
         </div>
       )}
-
     </div>
   );
 };

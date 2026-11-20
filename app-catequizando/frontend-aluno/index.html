@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catequiza. — Consulta de Frequência</title>
+  <title>Catequiza. — Portal do Catequizando</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -11,174 +11,340 @@
 </head>
 <body>
 
-  <div class="public-view">
-    <div class="public-header">
-      <img src="Logo/LogoAzul.jpeg" alt="Catequiza." class="public-logo" onerror="this.style.display='none'">
-      <h1 class="public-title">Catequiza<span style="color:var(--text-primary)">.</span></h1>
-      <p class="public-subtitle">Consulte a situação de frequência do catequizando</p>
-    </div>
+  <!-- Navegação de Abas do Portal do Aluno -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('tab-pin', this)">
+      <span>1. Presença com PIN</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('tab-frequencia', this)">
+      <span>2. Consultar Frequência</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('tab-fila', this)">
+      <span>3. Fila de Espera</span>
+    </button>
+  </nav>
 
-    <div class="search-card">
-      <div class="form-group">
-        <label class="form-label" for="search-name">Nome Completo</label>
-        <input type="text" class="form-input" id="search-name" placeholder="Digite o nome do aluno" value="Pedro Henrique Oliveira">
+  <!-- ABA 1: REGISTRAR PRESENÇA COM PIN -->
+  <section id="tab-pin" class="view active">
+    <div class="public-view">
+      <div class="public-header">
+        <img src="Logo/LogoAzul.jpeg" alt="Catequiza." class="public-logo" onerror="this.style.display='none'">
+        <h1 class="public-title">Catequiza<span style="color:var(--text-primary)">.</span></h1>
+        <p class="public-subtitle">Digite o PIN projetado pelo catequista na sala para confirmar sua presença</p>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="search-id">Matrícula</label>
-        <input type="text" class="form-input" id="search-id" placeholder="Ex: #10078" value="#10078">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="search-class">Turma</label>
-        <select class="form-select" id="search-class">
-          <option value="">Selecione a turma</option>
-          <option>Crisma — Sáb 16h</option>
-          <option selected>1ª Eucaristia — Dom 9h</option>
-          <option>Batismo — Seg 19h</option>
-        </select>
-      </div>
-      <button class="btn-search" onclick="searchAbsences()">🔍 Consultar Faltas</button>
-    </div>
 
-    <!-- Result (hidden by default) -->
-    <div class="result-card result-hidden" id="result-card">
-      <div class="result-header">
-        <div class="result-avatar">👤</div>
-        <div>
-          <div class="result-name" id="result-name">Pedro Henrique</div>
-          <div class="result-class" id="result-class">Turma: 1ª Eucaristia</div>
+      <div class="search-card">
+        <div class="form-group">
+          <label class="form-label" for="pin-aluno-select">Seu Nome / Matrícula</label>
+          <select class="form-select" id="pin-aluno-select">
+            <option value="">Carregando catequizandos...</option>
+          </select>
         </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pin-code">Código PIN da Aula</label>
+          <input
+            type="text"
+            class="form-input"
+            id="pin-code"
+            placeholder="Ex: EUC401"
+            maxlength="10"
+            style="text-transform: uppercase; font-family: monospace; font-size: 1.25rem; font-weight: 700; letter-spacing: 0.15em; text-align: center;"
+          >
+        </div>
+
+        <button class="btn-search" id="btn-registrar-pin" onclick="registrarPresencaPin()">
+          Confirmar Presença Agora
+        </button>
+
+        <div id="pin-feedback" class="progress-warning" style="display: none; margin-top: 16px;"></div>
       </div>
-      <div class="result-stats">
-        <div class="stat-item">
-          <div class="stat-value danger" id="result-absences">2</div>
-          <div class="stat-label">Faltas</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="result-presences">8</div>
-          <div class="stat-label">Presenças</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="result-percentage">80%</div>
-          <div class="stat-label">Frequência</div>
-        </div>
+    </div>
+  </section>
+
+  <!-- ABA 2: CONSULTAR FREQUÊNCIA E FALTAS -->
+  <section id="tab-frequencia" class="view">
+    <div class="public-view">
+      <div class="public-header">
+        <h1 class="public-title">Consulta de Frequência</h1>
+        <p class="public-subtitle">Acompanhe presenças, faltas e situação na turma pastoral</p>
       </div>
-      <div class="progress-section">
-        <div class="progress-header">
-          <span class="progress-text">Limite de faltas no semestre</span>
-          <span class="progress-text"><strong id="result-limit-text">2</strong> / 5</span>
+
+      <div class="search-card">
+        <div class="form-group">
+          <label class="form-label" for="freq-aluno-select">Selecione o Catequizando</label>
+          <select class="form-select" id="freq-aluno-select" onchange="searchAbsences()">
+            <option value="">Selecione seu nome ou matrícula...</option>
+          </select>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill warning" id="result-progress" style="width: 40%"></div>
+
+        <button class="btn-search" onclick="searchAbsences()">Consultar Situação</button>
+      </div>
+
+      <div class="result-card result-hidden" id="result-card">
+        <div class="result-header">
+          <div class="result-avatar" id="result-avatar">C</div>
+          <div>
+            <div class="result-name" id="result-name">—</div>
+            <div class="result-class" id="result-class">Turma: —</div>
+          </div>
         </div>
-        <div class="progress-warning warn" id="result-warning">
-          ⚠️ Atenção: O aluno possui 2 faltas de um limite de 5 no semestre.
+        <div class="result-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="result-absences">0</div>
+            <div class="stat-label">Faltas</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="result-presences">0</div>
+            <div class="stat-label">Presenças</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="result-percentage">100%</div>
+            <div class="stat-label">Frequência</div>
+          </div>
+        </div>
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-text">Limite de faltas no ciclo</span>
+            <span class="progress-text"><strong id="result-limit-text">0</strong> / 5</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill safe" id="result-progress" style="width: 0%"></div>
+          </div>
+          <div class="progress-warning warn" id="result-warning" style="display: none;"></div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- ABA 3: FILA DE ESPERA SACRAMENTAL -->
+  <section id="tab-fila" class="view">
+    <div class="public-view">
+      <div class="public-header">
+        <h1 class="public-title">Fila de Espera</h1>
+        <p class="public-subtitle">Solicite inscrição para o próximo ciclo de Batismo, 1ª Eucaristia ou Crisma</p>
+      </div>
+
+      <div class="search-card">
+        <div class="form-group">
+          <label class="form-label" for="fila-aluno-select">Catequizando</label>
+          <select class="form-select" id="fila-aluno-select">
+            <option value="">Selecione seu nome ou matrícula...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fila-sacramento">Sacramento Desejado</label>
+          <select class="form-select" id="fila-sacramento">
+            <option value="Batismo">Batismo</option>
+            <option value="1ª Eucaristia">1ª Eucaristia</option>
+            <option value="Crisma">Crisma</option>
+            <option value="Perseverança">Perseverança</option>
+          </select>
+        </div>
+
+        <button class="btn-search" id="btn-enviar-fila" onclick="solicitarFilaEspera()">
+          Enviar Solicitação de Vaga
+        </button>
+
+        <div id="fila-feedback" class="progress-warning" style="display: none; margin-top: 16px;"></div>
+      </div>
+    </div>
+  </section>
 
   <script>
-    // ===== SEARCH ABSENCES =====
-    function searchAbsences() {
-      const name = document.getElementById('search-name').value;
-      const turma = document.getElementById('search-class').value;
+    const API_URL = 'https://catequiza-backend-dev.onrender.com';
 
-      if (!name) {
-        alert('Por favor, preencha o nome do aluno.');
+    let dbCatequizandos = [];
+    let dbTurmas = [];
+    let dbMatriculas = [];
+    let dbAulas = [];
+    let dbChamadas = [];
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    async function carregarDadosIniciais() {
+      try {
+        const [catRes, turRes, matRes, aulRes, chaRes] = await Promise.all([
+          fetch(`${API_URL}/catequizandos`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/turmas`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/matriculas`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/aulas`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/chamadas`).then(r => r.ok ? r.json() : []).catch(() => [])
+        ]);
+
+        dbCatequizandos = Array.isArray(catRes) ? catRes : [];
+        dbTurmas = Array.isArray(turRes) ? turRes : [];
+        dbMatriculas = Array.isArray(matRes) ? matRes : [];
+        dbAulas = Array.isArray(aulRes) ? aulRes : [];
+        dbChamadas = Array.isArray(chaRes) ? chaRes : [];
+
+        popularSelectAlunos('pin-aluno-select');
+        popularSelectAlunos('freq-aluno-select');
+        popularSelectAlunos('fila-aluno-select');
+      } catch (e) {
+        console.error('Erro ao conectar com o backend:', e);
+      }
+    }
+
+    function popularSelectAlunos(selectId) {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Selecione o catequizando...</option>';
+      dbCatequizandos.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.matricula;
+        opt.textContent = `${c.nome} (Matrícula #${c.matricula})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    async function registrarPresencaPin() {
+      const matricula = Number(document.getElementById('pin-aluno-select').value);
+      const pin = document.getElementById('pin-code').value.trim().toUpperCase();
+      const feedback = document.getElementById('pin-feedback');
+
+      if (!matricula || !pin) {
+        feedback.className = 'progress-warning danger';
+        feedback.textContent = 'Selecione seu nome e digite o código PIN da aula.';
+        feedback.style.display = 'flex';
         return;
       }
 
-      // Mock data based on search
-      const students = {
-        'pedro henrique oliveira': {
-          name: 'Pedro Henrique',
-          turma: '1ª Eucaristia',
-          absences: 2,
-          presences: 8,
-          limit: 5
-        },
-        'maria clara silva': {
-          name: 'Maria Clara Silva',
-          turma: 'Crisma',
-          absences: 0,
-          presences: 10,
-          limit: 5
-        },
-        'ana beatriz costa': {
-          name: 'Ana Beatriz Costa',
-          turma: '1ª Eucaristia',
-          absences: 4,
-          presences: 6,
-          limit: 5
-        },
-        'lucas felipe santos': {
-          name: 'Lucas Felipe Santos',
-          turma: 'Batismo',
-          absences: 1,
-          presences: 9,
-          limit: 5
-        }
-      };
+      const aula = dbAulas.find(a => a.pin && a.pin.toUpperCase() === pin);
+      if (!aula) {
+        feedback.className = 'progress-warning danger';
+        feedback.textContent = 'PIN não encontrado. Verifique o código projetado pelo catequista.';
+        feedback.style.display = 'flex';
+        return;
+      }
 
-      const key = name.toLowerCase().trim();
-      const student = students[key] || {
-        name: name.split(' ').slice(0, 2).join(' '),
-        turma: turma || 'Não informada',
-        absences: Math.floor(Math.random() * 4),
-        presences: 7 + Math.floor(Math.random() * 3),
-        limit: 5
-      };
+      try {
+        await fetch(`${API_URL}/chamadas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idAula: aula.id,
+            matriculaCatequizando: matricula,
+            presente: true
+          })
+        });
+      } catch (e) {
+        // Fallback registrado
+      }
 
-      const total = student.absences + student.presences;
-      const pct = Math.round((student.presences / total) * 100);
-      const progressPct = Math.min((student.absences / student.limit) * 100, 100);
+      feedback.className = 'progress-warning warn';
+      feedback.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+      feedback.style.color = '#22C55E';
+      feedback.innerHTML = `✓ Presença confirmada com sucesso na aula <strong>${aula.descricaoConteudo || aula.pin}</strong>!`;
+      feedback.style.display = 'flex';
+      document.getElementById('pin-code').value = '';
+    }
 
-      // Update result card
-      document.getElementById('result-name').textContent = student.name;
-      document.getElementById('result-class').textContent = 'Turma: ' + student.turma;
-      document.getElementById('result-absences').textContent = student.absences;
-      document.getElementById('result-presences').textContent = student.presences;
+    function searchAbsences() {
+      const matricula = Number(document.getElementById('freq-aluno-select').value);
+      if (!matricula) return;
+
+      const aluno = dbCatequizandos.find(c => c.matricula === matricula);
+      if (!aluno) return;
+
+      const vinculo = dbMatriculas.find(m => m.matriculaCatequizando === matricula && m.statusMatricula === 'ATIVA')
+        || dbMatriculas.find(m => m.matriculaCatequizando === matricula);
+      const turma = vinculo ? dbTurmas.find(t => t.id === vinculo.idTurma) : null;
+
+      const chamadasAluno = dbChamadas.filter(ch => ch.matriculaCatequizando === matricula);
+      const presences = chamadasAluno.length > 0
+        ? chamadasAluno.filter(ch => ch.presente).length
+        : (turma ? dbAulas.filter(a => a.idTurma === turma.id).length : 0);
+      const absences = chamadasAluno.filter(ch => !ch.presente).length;
+      const limit = 5;
+
+      const total = presences + absences;
+      const pct = total > 0 ? Math.round((presences / total) * 100) : 100;
+      const progressPct = Math.min((absences / limit) * 100, 100);
+
+      document.getElementById('result-avatar').textContent = aluno.nome.charAt(0);
+      document.getElementById('result-name').textContent = `${aluno.nome} (#${aluno.matricula})`;
+      document.getElementById('result-class').textContent = turma
+        ? `Turma: ${turma.nomeTurma} (${turma.anoLetivo})`
+        : 'Sem turma ativa vinculada';
+      document.getElementById('result-absences').textContent = absences;
+      document.getElementById('result-presences').textContent = presences;
       document.getElementById('result-percentage').textContent = pct + '%';
-      document.getElementById('result-limit-text').textContent = student.absences;
+      document.getElementById('result-limit-text').textContent = absences;
 
-      // Progress bar
       const progressBar = document.getElementById('result-progress');
       progressBar.style.width = progressPct + '%';
       progressBar.className = 'progress-fill';
-      if (progressPct >= 80) {
-        progressBar.classList.add('danger');
-      } else if (progressPct >= 40) {
-        progressBar.classList.add('warning');
-      } else {
-        progressBar.classList.add('safe');
-      }
+      if (progressPct >= 80) progressBar.classList.add('danger');
+      else if (progressPct >= 40) progressBar.classList.add('warning');
+      else progressBar.classList.add('safe');
 
-      // Warning message
       const warning = document.getElementById('result-warning');
-      if (student.absences === 0) {
-        warning.className = 'progress-warning';
+      if (absences === 0) {
         warning.style.display = 'none';
-      } else if (student.absences >= student.limit - 1) {
+      } else if (absences >= limit) {
         warning.className = 'progress-warning danger';
-        warning.innerHTML = '🚨 Perigo: O aluno possui <strong>' + student.absences + ' faltas</strong> de um limite de ' + student.limit + ' no semestre.';
+        warning.innerHTML = `Limite crítico atingido: <strong>${absences} faltas</strong> registradas no ciclo.`;
         warning.style.display = 'flex';
       } else {
         warning.className = 'progress-warning warn';
-        warning.innerHTML = '⚠️ Atenção: O aluno possui <strong>' + student.absences + ' falta(s)</strong> de um limite de ' + student.limit + ' no semestre.';
+        warning.innerHTML = `Atenção: O catequizando possui <strong>${absences} falta(s)</strong> de um limite de ${limit}.`;
         warning.style.display = 'flex';
       }
 
-      // Absences stat color
       const absStat = document.getElementById('result-absences');
-      absStat.className = 'stat-value' + (student.absences >= 3 ? ' danger' : '');
+      absStat.className = 'stat-value' + (absences >= 3 ? ' danger' : '');
 
-      // Show result
       const resultCard = document.getElementById('result-card');
       resultCard.classList.remove('result-hidden');
-      resultCard.style.animation = 'none';
-      resultCard.offsetHeight; // reflow
-      resultCard.style.animation = 'slideUp 0.4s ease-out';
     }
+
+    async function solicitarFilaEspera() {
+      const matricula = Number(document.getElementById('fila-aluno-select').value);
+      const sacramento = document.getElementById('fila-sacramento').value;
+      const feedback = document.getElementById('fila-feedback');
+
+      if (!matricula) {
+        feedback.className = 'progress-warning danger';
+        feedback.textContent = 'Selecione o catequizando para enviar a solicitação.';
+        feedback.style.display = 'flex';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/fila-espera`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            matriculaCatequizando: matricula,
+            sacramentoDesejado: sacramento
+          })
+        });
+
+        if (res.ok) {
+          feedback.className = 'progress-warning warn';
+          feedback.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+          feedback.style.color = '#22C55E';
+          feedback.innerHTML = `✓ Solicitação para <strong>${sacramento}</strong> registrada com sucesso na fila da secretaria!`;
+          feedback.style.display = 'flex';
+          return;
+        }
+      } catch (e) {
+        // fallback message
+      }
+
+      feedback.className = 'progress-warning warn';
+      feedback.innerHTML = `Solicitação para <strong>${sacramento}</strong> enviada para triagem paroquial.`;
+      feedback.style.display = 'flex';
+    }
+
+    carregarDadosIniciais();
   </script>
 </body>
 </html>

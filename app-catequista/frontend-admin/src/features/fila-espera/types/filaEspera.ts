@@ -1,4 +1,12 @@
-export type FilaStatus = 'PENDENTE' | 'EM_ANALISE' | 'CONCLUIDA' | 'CANCELADA' | string;
+export type FilaStatus =
+  | 'PENDENTE'
+  | 'CHAMADO'
+  | 'EM_ANALISE'
+  | 'MATRICULADO'
+  | 'CONCLUIDA'
+  | 'CANCELADO'
+  | 'CANCELADA'
+  | string;
 
 export interface FilaEsperaItem {
   id: number;
@@ -6,6 +14,14 @@ export interface FilaEsperaItem {
   sacramentoDesejado: string;
   dataSolicitacao: string;
   status: FilaStatus;
+  nomeCatequizando?: string;
+  cpfCatequizando?: string;
+  telefoneCatequizando?: string;
+}
+
+export interface CadastrarFilaDTO {
+  matriculaCatequizando: number;
+  sacramentoDesejado: string;
 }
 
 export interface AtualizarFilaDTO {

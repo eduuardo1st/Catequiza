@@ -1,6 +1,7 @@
 package com.catequiza.admin.controllers;
 
 import com.catequiza.admin.repositories.CatequistaRepository;
+import com.catequiza.admin.repositories.CatequizandoRepository;
 import com.catequiza.admin.repositories.FilaEsperaRepository;
 import com.catequiza.admin.security.TokenService;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ class FilaEsperaControllerTest {
 
     @MockBean
     private FilaEsperaRepository filaEsperaRepository;
+
+    @MockBean
+    private CatequizandoRepository catequizandoRepository;
 
     @MockBean
     private TokenService tokenService;

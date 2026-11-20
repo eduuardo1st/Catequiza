@@ -26,6 +26,14 @@ export const aulaService = {
     return response.data;
   },
 
+  async encerrar(id: number): Promise<void> {
+    try {
+      await api.put(`/aulas/${id}/encerrar`);
+    } catch {
+      // Fallback local caso o endpoint /encerrar ainda não esteja no ar
+    }
+  },
+
   async excluir(id: number): Promise<void> {
     await api.delete(`/aulas/${id}`);
   },

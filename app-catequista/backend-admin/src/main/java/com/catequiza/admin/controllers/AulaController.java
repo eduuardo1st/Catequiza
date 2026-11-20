@@ -1,11 +1,12 @@
 package com.catequiza.admin.controllers;
 
-import com.catequiza.admin.controllers.dto.DadosCadastroAula;
 import com.catequiza.admin.controllers.dto.DadosAtualizacaoAula;
+import com.catequiza.admin.controllers.dto.DadosCadastroAula;
 import com.catequiza.admin.controllers.dto.DadosDetalhamentoAula;
 import com.catequiza.admin.domain.Aula;
 import com.catequiza.admin.repositories.AulaRepository;
 import com.catequiza.admin.repositories.TurmaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +35,10 @@ public class AulaController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<DadosDetalhamentoAula> cadastrar(@RequestBody @Valid DadosCadastroAula dados, UriComponentsBuilder uriBuilder) {
         var turma = turmaRepository.findById(dados.idTurma())
-                .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Turma não encontrada com ID " + dados.idTurma()));
 
         var aula = new Aula(dados, turma);
         aulaRepository.save(aula);
@@ -53,19 +55,31 @@ public class AulaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DadosDetalhamentoAula> detalhar(@PathVariable Long id) {
-        var aula = aulaRepository.getReferenceById(id);
+        var aula = aulaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Aula não encontrada com ID " + id));
         return ResponseEntity.ok(new DadosDetalhamentoAula(aula));
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity<DadosDetalhamentoAula> atualizar(@RequestBody @Valid DadosAtualizacaoAula dados) {
-        var aula = aulaRepository.getReferenceById(dados.id());
+        var aula = aulaRepository.findById(dados.id())
+                .orElseThrow(() -> new EntityNotFoundException("Aula não encontrada com ID " + dados.id()));
         aula.atualizarInformacoes(dados);
         return ResponseEntity.ok(new DadosDetalhamentoAula(aula));
     }
 
+    @PutMapping("/{id}/encerrar")
+    @Transactional
+    public ResponseEntity<DadosDetalhamentoAula> encerrarSessao(@PathVariable Long id) {
+        var aula = aulaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Aula não encontrada com ID " + id));
+        aula.encerrarSessao();
+        return ResponseEntity.ok(new DadosDetalhamentoAula(aula));
+    }
+
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         aulaRepository.deleteById(id);
         return ResponseEntity.noContent().build();

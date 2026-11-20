@@ -5,6 +5,7 @@ import com.catequiza.aluno.domain.Chamada;
 import com.catequiza.aluno.repositories.AulaRepository;
 import com.catequiza.aluno.repositories.CatequizandoRepository;
 import com.catequiza.aluno.repositories.ChamadaRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,11 +32,13 @@ public class ChamadaController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<String> registrar(@RequestBody @Valid DadosRegistroChamada dados) {
-        var aula = aulaRepository.findByPin(dados.pin())
+        String pinNormalizado = dados.pin().trim().toUpperCase();
+        var aula = aulaRepository.findByPin(pinNormalizado)
                 .orElseThrow(() -> new RuntimeException("PIN inválido ou aula não encontrada"));
 
-        if (LocalDateTime.now().isAfter(aula.getHorarioExpiracao())) {
+        if (aula.getHorarioExpiracao() != null && LocalDateTime.now().isAfter(aula.getHorarioExpiracao())) {
             throw new RuntimeException("PIN expirado");
         }
 

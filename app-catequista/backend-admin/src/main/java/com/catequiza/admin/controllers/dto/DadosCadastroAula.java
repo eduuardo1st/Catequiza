@@ -6,6 +6,10 @@ import java.time.LocalDate;
 public record DadosCadastroAula(
         @NotNull Long idTurma,
         @NotNull LocalDate data,
-        String descricaoConteudo
+        String descricaoConteudo,
+        Integer minutosValidade
 ) {
+    public DadosCadastroAula(Long idTurma, LocalDate data, String descricaoConteudo) {
+        this(idTurma, data, descricaoConteudo, null);
+    }
 }
