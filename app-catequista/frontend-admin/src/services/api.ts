@@ -177,7 +177,7 @@ function extrairHorario(nomeTurma: string): string {
 
 function extrairSala(idTurma: number, sacramento: Sacramento): string {
   if (sacramento === 'Crisma' || sacramento === 'Adultos') return `Salão Paroquial • Sala ${idTurma}`;
-  if (sacramento === 'Batismo') return 'Capela São José';
+  if (sacramento === 'Batismo') return 'Igreja Matriz • Batistério';
   return `Centro Catequético • Sala 0${idTurma}`;
 }
 

@@ -53,9 +53,9 @@ export function parseApiError(err: any, fallbackMessage = 'Ocorreu um erro na re
       category: 'auth',
       description: 'O servidor backend rejeitou a requisição por falta de autenticação válida.',
       cause:
-        'A rota acessada exige um token JWT no cabeçalho Authorization. Como o login foi ignorado ou simulado para testes, o Spring Security bloqueou a consulta aos dados.',
+        'A rota acessada exige um token JWT no cabeçalho Authorization ou permissão administrativa.',
       solution:
-        'Faça login com um e-mail e senha cadastrados no banco para obter um token JWT real, ou configure a rota como pública no backend (SecurityConfig.java).',
+        'Faça login com um e-mail e senha cadastrados para obter um token JWT válido.',
       status,
       url,
       method,
@@ -71,8 +71,8 @@ export function parseApiError(err: any, fallbackMessage = 'Ocorreu um erro na re
         category: 'server',
         description: 'O serviço no Render não conseguiu responder dentro do tempo esperado.',
         cause:
-          'Em planos gratuitos, o Render coloca instâncias inativas em hibernação. Ao receber a primeira chamada, ele pode levar de 30 a 60 segundos para iniciar completamente (Cold Start).',
-        solution: 'Aguarde cerca de 30 a 50 segundos para o servidor subir e clique em "Tentar Novamente".',
+          'Instâncias em hibernação podem levar de 30 a 60 segundos para iniciar completamente (Cold Start).',
+        solution: 'Aguarde alguns segundos e clique em "Tentar Novamente".',
         status,
         url,
         method,
@@ -85,9 +85,8 @@ export function parseApiError(err: any, fallbackMessage = 'Ocorreu um erro na re
       title: `Erro Interno do Servidor (HTTP ${status})`,
       category: 'database',
       description: 'O backend recebeu a requisição, mas falhou ao executá-la internamente.',
-      cause:
-        'Ocorreu uma exceção no Spring Boot ao consultar o banco de dados PostgreSQL (por exemplo: tabela inexistente, erro de chave estrangeira ou falha de conexão).',
-      solution: 'Verifique os logs de execução do serviço no painel do Render para ver o erro detalhado.',
+      cause: 'Ocorreu uma exceção no serviço ao consultar o banco de dados PostgreSQL.',
+      solution: 'Verifique os logs do serviço no painel do Render ou tente novamente.',
       status,
       url,
       method,
@@ -101,8 +100,8 @@ export function parseApiError(err: any, fallbackMessage = 'Ocorreu um erro na re
       title: 'Rota Não Encontrada (HTTP 404)',
       category: 'server',
       description: 'O endpoint solicitado não foi encontrado no servidor.',
-      cause: `A rota "${url}" não existe ou a URL base da API está configurada incorretamente.`,
-      solution: 'Verifique se a rota está implementada no controller do backend e mapeada corretamente.',
+      cause: `A rota "${url}" não existe ou ainda não foi publicada.`,
+      solution: 'Verifique se a versão mais recente do backend foi publicada.',
       status,
       url,
       method,
@@ -116,10 +115,8 @@ export function parseApiError(err: any, fallbackMessage = 'Ocorreu um erro na re
       title: 'Falha de Comunicação com a API',
       category: 'network',
       description: 'O navegador enviou a solicitação mas não recebeu nenhuma resposta.',
-      cause:
-        `Não foi possível alcançar ${baseURL}. Causas comuns incluem: servidor do Render hibernando ou desligado, bloqueio de CORS pelo navegador ou falta de internet.`,
-      solution:
-        'Verifique se a URL do backend está correta e se a aplicação no Render está no status "Live".',
+      cause: `Não foi possível alcançar ${baseURL}. O servidor pode estar hibernando ou sem conexão.`,
+      solution: 'Aguarde alguns instantes e clique em "Tentar Novamente".',
       status: 0,
       url,
       method,
@@ -168,11 +165,11 @@ export const ApiErrorAlert: React.FC<ApiErrorAlertProps> = ({
   const info: ApiErrorInfo =
     typeof error === 'string'
       ? {
-          title: 'Erro no Sistema',
+          title: 'Atenção',
           category: 'unknown',
           description: error,
-          cause: 'O sistema retornou uma mensagem de erro.',
-          solution: 'Tente recarregar a tela.',
+          cause: 'Verifique os dados informados.',
+          solution: 'Corrija o campo indicado e tente novamente.',
         }
       : parseApiError(error);
 
@@ -210,36 +207,36 @@ export const ApiErrorAlert: React.FC<ApiErrorAlertProps> = ({
 
   return (
     <div
-      className={`rounded-xl border border-red-900/60 bg-red-950/30 p-4 text-xs text-red-200 shadow-md animate-fadeIn ${className}`}
+      className={`rounded-xl border border-red-200 bg-red-50/90 p-4 text-xs text-red-900 shadow-sm animate-fadeIn ${className}`}
     >
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-red-900/40 text-red-300 shrink-0 mt-0.5">
-            {info.category === 'auth' && <Lock className="w-4 h-4 text-amber-400" />}
-            {info.category === 'database' && <Database className="w-4 h-4 text-red-400" />}
-            {info.category === 'network' && <WifiOff className="w-4 h-4 text-amber-400" />}
-            {info.category === 'server' && <Server className="w-4 h-4 text-orange-400" />}
-            {info.category === 'unknown' && <AlertCircle className="w-4 h-4 text-red-400" />}
+          <div className="p-2 rounded-lg bg-red-100 text-red-700 shrink-0 mt-0.5">
+            {info.category === 'auth' && <Lock className="w-4 h-4 text-amber-700" />}
+            {info.category === 'database' && <Database className="w-4 h-4 text-red-700" />}
+            {info.category === 'network' && <WifiOff className="w-4 h-4 text-amber-700" />}
+            {info.category === 'server' && <Server className="w-4 h-4 text-red-700" />}
+            {info.category === 'unknown' && <AlertCircle className="w-4 h-4 text-red-700" />}
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-bold text-white text-sm tracking-tight">{info.title}</h4>
+              <h4 className="font-bold text-red-950 text-sm tracking-tight">{info.title}</h4>
               {info.status !== undefined && info.status > 0 && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-red-900/60 text-red-300 border border-red-800">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-red-100 text-red-800 border border-red-200">
                   HTTP {info.status}
                 </span>
               )}
             </div>
 
-            <p className="text-slate-300 leading-relaxed">{info.description}</p>
+            <p className="text-red-900 leading-relaxed">{info.description}</p>
 
-            <div className="pt-1.5 space-y-1">
-              <p className="text-slate-400">
-                <strong className="text-slate-200">Motivo:</strong> {info.cause}
+            <div className="pt-1 space-y-1 text-red-800/90">
+              <p>
+                <strong className="text-red-950">Motivo:</strong> {info.cause}
               </p>
-              <p className="text-slate-400">
-                <strong className="text-slate-200">Como resolver:</strong> {info.solution}
+              <p>
+                <strong className="text-red-950">Como resolver:</strong> {info.solution}
               </p>
             </div>
           </div>
@@ -249,7 +246,7 @@ export const ApiErrorAlert: React.FC<ApiErrorAlertProps> = ({
           {onRetry && (
             <button
               onClick={onRetry}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-900/50 hover:bg-red-800/60 text-white font-medium text-xs transition-colors border border-red-700/50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white font-semibold text-xs transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Tentar Novamente</span>
@@ -259,13 +256,13 @@ export const ApiErrorAlert: React.FC<ApiErrorAlertProps> = ({
           <button
             onClick={checkDatabaseHealth}
             disabled={isCheckingHealth}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition-colors border border-slate-700 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-carmel-50 text-carmel-800 font-semibold text-xs transition-colors border border-carmel-200 disabled:opacity-50"
             title="Executa teste no endpoint /health da API"
           >
             {isCheckingHealth ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-parish-400" />
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-700" />
             ) : (
-              <Database className="w-3.5 h-3.5 text-parish-400" />
+              <Database className="w-3.5 h-3.5 text-gold-700" />
             )}
             <span>Diagnosticar Conexão</span>
           </button>
@@ -276,76 +273,75 @@ export const ApiErrorAlert: React.FC<ApiErrorAlertProps> = ({
         <div
           className={`mt-3 p-3 rounded-lg border text-xs flex items-start gap-2.5 ${
             healthResult.online && healthResult.dbConnected
-              ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-200'
-              : 'bg-amber-950/40 border-amber-800/60 text-amber-200'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+              : 'bg-amber-50 border-amber-200 text-amber-900'
           }`}
         >
           {healthResult.online && healthResult.dbConnected ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
           )}
 
           <div className="space-y-0.5">
-            <p className="font-semibold text-white">
+            <p className="font-semibold">
               {healthResult.online && healthResult.dbConnected
                 ? 'Diagnóstico da Conexão: Backend e Banco de Dados estão ONLINE!'
                 : 'Diagnóstico da Conexão: Falha identificada na API'}
             </p>
             {healthResult.online && healthResult.dbConnected ? (
-              <p className="text-emerald-300">
-                A API respondeu com sucesso e a conexão com o PostgreSQL ({healthResult.product || 'PostgreSQL'}) está ativa.
-                Isso confirma que o banco de dados está funcionando perfeitamente e o erro atual decorre de autenticação/permissão.
+              <p className="text-emerald-800">
+                A API respondeu com sucesso e a conexão com o {healthResult.product || 'PostgreSQL'} está ativa.
               </p>
             ) : (
-              <p className="text-amber-300">
-                {healthResult.error || 'O backend não conseguiu se comunicar com o banco de dados ou a rota /health não respondeu.'}
+              <p className="text-amber-800">
+                {healthResult.error || 'O backend não respondeu na rota /health.'}
               </p>
             )}
           </div>
         </div>
       )}
 
-      <div className="mt-3 pt-2.5 border-t border-red-900/40 flex items-center justify-between">
+      <div className="mt-3 pt-2.5 border-t border-red-200/80 flex items-center justify-between">
         <button
           onClick={() => setShowDetails((prev) => !prev)}
-          className="inline-flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+          className="inline-flex items-center gap-1.5 text-[11px] font-medium text-red-800 hover:text-red-950 transition-colors"
         >
           {showDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           <span>{showDetails ? 'Ocultar detalhes técnicos' : 'Ver detalhes técnicos da requisição'}</span>
         </button>
 
-        <span className="text-[11px] text-slate-400 font-mono">
-          Token JWT local: {hasToken ? 'Presente' : 'Ausente (Não logado)'}
+        <span className="text-[11px] text-red-800/80 font-mono">
+          Token JWT: {hasToken ? 'Presente' : 'Ausente'}
         </span>
       </div>
 
       {showDetails && (
-        <div className="mt-2.5 p-3 rounded-lg bg-slate-950 border border-slate-800 font-mono text-[11px] text-slate-300 space-y-1.5 overflow-x-auto">
+        <div className="mt-2.5 p-3 rounded-lg bg-white border border-red-200 font-mono text-[11px] text-carmel-800 space-y-1.5 overflow-x-auto">
           {info.method && info.url && (
             <div>
-              <span className="text-slate-500">Endpoint: </span>
-              <span className="text-parish-400 font-semibold">{info.method}</span> {info.url}
+              <span className="text-carmel-500">Endpoint: </span>
+              <span className="text-gold-700 font-semibold">{info.method}</span> {info.url}
             </div>
           )}
           {info.status !== undefined && (
             <div>
-              <span className="text-slate-500">Status HTTP: </span>
-              <span className={info.status >= 400 ? 'text-red-400' : 'text-emerald-400'}>
+              <span className="text-carmel-500">Status HTTP: </span>
+              <span className={info.status >= 400 ? 'text-red-700 font-semibold' : 'text-emerald-700'}>
                 {info.status}
               </span>
             </div>
           )}
           {info.serverMessage && (
             <div>
-              <span className="text-slate-500">Mensagem do servidor: </span>
-              <span className="text-amber-300">{info.serverMessage}</span>
+              <span className="text-carmel-500">Mensagem: </span>
+              <span className="text-amber-800">{info.serverMessage}</span>
             </div>
           )}
           {info.raw && (
             <div>
-              <span className="text-slate-500">Payload bruto: </span>
-              <pre className="mt-1 text-[10px] text-slate-400 whitespace-pre-wrap max-h-36 overflow-y-auto bg-slate-900 p-2 rounded">
+              <span className="text-carmel-500">Payload: </span>
+              <pre className="mt-1 text-[10px] text-carmel-700 whitespace-pre-wrap max-h-36 overflow-y-auto bg-carmel-50 p-2 rounded border border-carmel-200">
                 {JSON.stringify(info.raw, null, 2)}
               </pre>
             </div>

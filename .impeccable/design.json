@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-23T22:45:00Z",
+  "title": "Design System: Catequiza. — Paróquia Nossa Senhora do Carmo",
+  "extensions": {
+    "colorMeta": {
+      "carmel-habit": {
+        "role": "primary",
+        "displayName": "Marrom Carmelita do Hábito",
+        "canonical": "#3B2112",
+        "tonalRamp": ["#26150B", "#3B2112", "#4A2916", "#5A3621", "#6D4B34", "#8F755C", "#D2C1A9", "#FAF6EE"]
+      },
+      "heraldic-gold": {
+        "role": "secondary",
+        "displayName": "Dourado Heráldico do Brasão",
+        "canonical": "#AF915D",
+        "tonalRamp": ["#3E2D13", "#5A431F", "#75592C", "#92733F", "#AF915D", "#C5A56B", "#EAD9B4", "#FCF9F2"]
+      },
+      "parchment-ground": {
+        "role": "neutral",
+        "displayName": "Pergaminho Claro",
+        "canonical": "#FAF6EE",
+        "tonalRamp": ["#26150B", "#4A2916", "#6D4B34", "#785C45", "#D2C1A9", "#E5DAC8", "#F3EBD9", "#FAF6EE"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (Marcellus)", "purpose": "Marca Catequiza. e títulos principais de página." },
+      "body": { "displayName": "Body (Source Sans 3)", "purpose": "Tabelas, formulários, navegação e leitura diária." },
+      "mono": { "displayName": "Mono (JetBrains Mono)", "purpose": "PINs de chamada, CPFs, matrículas e datas." }
+    },
+    "shadows": [
+      { "name": "card", "value": "0 2px 10px -2px rgba(59, 33, 18, 0.06), 0 1px 3px 0 rgba(59, 33, 18, 0.04)", "purpose": "Elevação sutil para cartões e tabelas em repouso." },
+      { "name": "card-hover", "value": "0 10px 24px -6px rgba(59, 33, 18, 0.12), 0 4px 8px -2px rgba(59, 33, 18, 0.05)", "purpose": "Resposta tátil em cards de turma clicáveis." },
+      { "name": "modal", "value": "0 24px 48px -12px rgba(38, 21, 11, 0.28)", "purpose": "Modais operacionais e projeção do PIN." }
+    ],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Transições curtas (150–200ms) de foco, hover e abertura de modais." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal de cada tela ou modal (Nova Turma, Iniciar Encontro, Confirmar Presença).",
+      "html": "<button class=\"ds-btn-primary\">Nova Turma</button>",
+      "css": ".ds-btn-primary { background: #4A2916; color: #FAF6EE; border: none; border-radius: 8px; padding: 10px 18px; font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background: #5A3621; } .ds-btn-primary:focus-visible { outline: 2px solid #AF915D; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ações auxiliares como Atualizar, Voltar ou Cancelar.",
+      "html": "<button class=\"ds-btn-secondary\">Atualizar</button>",
+      "css": ".ds-btn-secondary { background: #FFFFFF; color: #4A2916; border: 1px solid #E5DAC8; border-radius: 8px; padding: 10px 16px; font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; } .ds-btn-secondary:hover { background: #F3EBD9; }"
+    },
+    {
+      "name": "Parchment Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Campo de entrada padrão em formulários e barras de busca.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Buscar por nome ou CPF...\" />",
+      "css": ".ds-input { width: 100%; background: #FAF6EE; color: #26150B; border: 1px solid #E5DAC8; border-radius: 8px; padding: 10px 14px; font-family: 'Source Sans 3', sans-serif; font-size: 14px; transition: border-color 0.2s, background 0.2s; } .ds-input::placeholder { color: #785C45; } .ds-input:focus { outline: none; background: #FFFFFF; border-color: #AF915D; box-shadow: 0 0 0 3px rgba(175, 145, 93, 0.22); }"
+    },
+    {
+      "name": "Sacrament Badge",
+      "kind": "chip",
+      "refersTo": "card-surface",
+      "description": "Identificação sacramental em cartões de turma e fila de espera.",
+      "html": "<span class=\"ds-badge-gold\">1ª Eucaristia</span>",
+      "css": ".ds-badge-gold { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; background: #F6EEDB; color: #5A431F; border: 1px solid #EAD9B4; font-family: 'Source Sans 3', sans-serif; font-size: 12px; font-weight: 600; }"
+    },
+    {
+      "name": "Carmelite Sidebar Item",
+      "kind": "nav",
+      "refersTo": "sidebar-shell",
+      "description": "Item ativo da barra lateral em marrom carmelita profundo.",
+      "html": "<div class=\"ds-nav-wrap\"><a class=\"ds-nav-item ds-nav-active\" href=\"#\">Turmas</a><a class=\"ds-nav-item\" href=\"#\">Catequizandos</a></div>",
+      "css": ".ds-nav-wrap { background: #3B2112; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px; width: 220px; } .ds-nav-item { display: block; padding: 10px 14px; border-radius: 8px; color: rgba(250, 246, 238, 0.85); text-decoration: none; font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 500; } .ds-nav-item:hover { background: rgba(74, 41, 22, 0.6); color: #FAF6EE; } .ds-nav-active { background: #4A2916; color: #FAF6EE; box-shadow: inset 0 0 0 1px rgba(217, 190, 135, 0.35); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Secretaria Carmelita em Pergaminho Vivo",
+    "overview": "A identidade visual do Catequiza. foi moldada diretamente a partir da comunicação oficial da Paróquia Nossa Senhora do Carmo (Arquidiocese de Brasília — Taguatinga Sul): a clareza luminosa do papel pergaminho claro combinada à sobriedade do marrom carmelita do hábito e ao dourado heráldico do brasão paroquial (#AF915D).",
+    "keyCharacteristics": [
+      "Paleta derivada diretamente das peças gráficas e do brasão oficial da Paróquia Nossa Senhora do Carmo.",
+      "Hierarquia clara entre área institucional (marrom carmelita profundo) e área operacional (pergaminho claro + superfícies brancas).",
+      "Tipografia clássica de inscrição romana (Marcellus) restrita a títulos e marca, combinada à sans-serif humanista de trabalho (Source Sans 3).",
+      "Contraste WCAG AA garantido em textos, placeholders, badges sacramentais e tabelas."
+    ],
+    "rules": [
+      { "name": "The Carmelite Anchor Rule", "body": "O marrom carmelita profundo (#3B2112) pertence à moldura institucional; o espaço de trabalho diário permanece claro (#FAF6EE + #FFFFFF).", "section": "colors" },
+      { "name": "The Accessible Gold Rule", "body": "Nunca utilize #AF915D ou #D9BE87 para texto pequeno sobre fundos claros; utilize #75592C sobre fundos claros e #D9BE87 sobre marrom escuro.", "section": "colors" },
+      { "name": "The Workhorse Control Rule", "body": "Marcellus nunca aparece em botões, inputs, cabeçalhos de tabela ou badges; todos os controles operacionais usam Source Sans 3.", "section": "typography" }
+    ],
+    "dos": [
+      "Do manter o brasão oficial da Paróquia Nossa Senhora do Carmo em medalhão marfim sobre fundos escuros e com mix-blend-multiply sobre pergaminho claro.",
+      "Do aplicar tabular-nums em todas as colunas de faltas, frequências, matrículas, datas e CPFs.",
+      "Do usar as cores semânticas litúrgicas (#15693B, #925308, #A32222) sobre fundos tintados claros com bordas correspondentes."
+    ],
+    "donts": [
+      "Don't misturar elementos azul-escuro (slate-900 / azul corporativo antigo) com a paleta carmelita.",
+      "Don't usar texto com gradiente, bordas laterais grossas (border-l-4) ou sombras neon em cartões e linhas de tabela.",
+      "Don't aplicar Marcellus em rótulos pequenos, botões ou células numéricas de tabela."
+    ]
+  }
+}

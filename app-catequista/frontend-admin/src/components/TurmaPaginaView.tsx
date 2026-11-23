@@ -56,7 +56,6 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
     carregarAlunos();
   }, [carregarAlunos]);
 
-  // Atualizar contador regressivo de tempo do PIN
   useEffect(() => {
     if (!turma.aulaAtiva?.horarioExpiracao) return;
 
@@ -84,7 +83,6 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
     return () => clearInterval(interval);
   }, [turma.aulaAtiva?.horarioExpiracao]);
 
-  // Iniciar aula
   const handleIniciarAula = async () => {
     setActionLoading(true);
     try {
@@ -96,7 +94,6 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
     }
   };
 
-  // Encerrar aula
   const handleEncerrarAula = async () => {
     if (!window.confirm('Deseja encerrar a sessão de chamada desta turma?')) return;
     setActionLoading(true);
@@ -109,7 +106,6 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
     }
   };
 
-  // Copiar PIN
   const handleCopyPin = () => {
     if (!turma.aulaAtiva?.pin) return;
     navigator.clipboard.writeText(turma.aulaAtiva.pin);
@@ -117,7 +113,6 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
     setTimeout(() => setCopiedPin(false), 2000);
   };
 
-  // Alternar presença manual do aluno e persistir no backend
   const handleTogglePresenca = async (aluno: Catequizando) => {
     const novoStatus = !aluno.presencaNaAula;
     const aulaIdAlvo =
@@ -160,162 +155,160 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
-      {/* 1. Header com Navegação e Breadcrumb */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-2">
+      {/* 1. Cabeçalho da Turma */}
+      <div className="bg-white border border-carmel-200 rounded-2xl p-5 sm:p-6 shadow-card">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="space-y-2.5">
             <button
               onClick={onVoltar}
-              className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors bg-slate-950/80 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-800"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-carmel-700 hover:text-carmel-950 transition-colors bg-carmel-50 hover:bg-carmel-100 px-3 py-1.5 rounded-lg border border-carmel-200"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Voltar para todas as Turmas</span>
+              <span>Voltar para Turmas</span>
             </button>
 
-            <div className="flex items-center gap-2 pt-1 flex-wrap">
-              <span className="px-2.5 py-0.5 text-xs font-semibold rounded-md bg-parish-900/90 text-parish-200 border border-parish-700/40">
+            <div className="flex items-center gap-2 pt-0.5 flex-wrap">
+              <span className="px-2.5 py-0.5 text-xs font-semibold rounded-md bg-gold-100 text-gold-800 border border-gold-300">
                 {turma.sacramento}
               </span>
-              <span className="text-xs text-slate-400">Ano Letivo {turma.anoLetivo}</span>
+              <span className="text-xs font-medium text-carmel-600 tabular-nums">
+                Ano Letivo {turma.anoLetivo}
+              </span>
               {turma.aulaAtiva && (
-                <span className="px-2.5 py-0.5 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
-                  <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
+                <span className="px-2.5 py-0.5 text-xs font-bold rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5">
+                  <Radio className="w-3 h-3 text-emerald-700 animate-pulse" />
                   Aula Ao Vivo: PIN {turma.aulaAtiva.pin}
                 </span>
               )}
             </div>
 
-            <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+            <h1 className="font-heading text-2xl sm:text-3xl text-carmel-950 tracking-tight">
               {turma.nomeTurma}
             </h1>
 
-            <div className="flex items-center gap-4 text-xs text-slate-400 pt-0.5 flex-wrap">
+            <div className="flex items-center gap-4 text-xs text-carmel-600 pt-0.5 flex-wrap">
               <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                <Clock className="w-3.5 h-3.5 text-gold-600" />
                 {turma.horario}
               </span>
               <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                <MapPin className="w-3.5 h-3.5 text-gold-600" />
                 {turma.sala}
               </span>
               <span className="flex items-center gap-1.5">
-                <UserCheck className="w-3.5 h-3.5 text-slate-500" />
-                Catequista: <strong className="text-slate-300 font-medium">{turma.catequistaNome}</strong>
+                <UserCheck className="w-3.5 h-3.5 text-gold-600" />
+                Catequista: <strong className="text-carmel-900 font-semibold">{turma.catequistaNome}</strong>
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:self-start">
-            <div className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-right">
-              <div className="text-[10px] text-slate-400 uppercase font-medium">Catequizandos</div>
-              <div className="font-heading font-bold text-lg text-white">
-                {alunos.length} matriculados
-              </div>
+          <div className="px-4 py-2.5 rounded-xl bg-carmel-50 border border-carmel-200 text-left sm:text-right shrink-0">
+            <div className="text-[11px] text-carmel-600 uppercase font-semibold tracking-wide">
+              Catequizandos
+            </div>
+            <div className="font-sans font-bold text-lg text-carmel-950 tabular-nums">
+              {alunos.length} matriculados
             </div>
           </div>
         </div>
 
-        {/* 2. Seletores de Seção por Blocos/Cards de Topo */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-800">
-          {/* Card 1: Aula de Hoje */}
+        {/* Navegação interna por abas limpas */}
+        <div
+          className="flex flex-wrap gap-2 mt-6 pt-5 border-t border-carmel-200"
+          role="tablist"
+          aria-label="Seções da turma"
+        >
           <button
+            role="tab"
+            aria-selected={secaoAtiva === 'AULA_DIA'}
             onClick={() => setSecaoAtiva('AULA_DIA')}
-            className={`p-4 rounded-xl text-left border transition-all flex flex-col justify-between ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-semibold border transition-colors flex items-center gap-2 ${
               secaoAtiva === 'AULA_DIA'
-                ? 'bg-parish-950/60 border-parish-500/80 shadow-glow text-white'
-                : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                ? 'bg-carmel-800 text-carmel-50 border-carmel-800 shadow-sm'
+                : 'bg-carmel-50 text-carmel-700 border-carmel-200 hover:bg-carmel-100 hover:text-carmel-950'
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-heading font-bold text-xs uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-parish-400" />
-                Aula do Dia & PIN
-              </span>
-              {turma.aulaAtiva && (
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-              )}
-            </div>
-            <div className="text-xs text-slate-300 font-medium">
-              {turma.aulaAtiva ? 'Sessão aberta com PIN ativo' : 'Pronta para iniciar encontro'}
-            </div>
+            <Sparkles className={`w-4 h-4 ${secaoAtiva === 'AULA_DIA' ? 'text-gold-300' : 'text-gold-700'}`} />
+            <span>Aula do Dia & PIN</span>
+            {turma.aulaAtiva && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            )}
           </button>
 
-          {/* Card 2: Registro de Alunos */}
           <button
+            role="tab"
+            aria-selected={secaoAtiva === 'ALUNOS'}
             onClick={() => setSecaoAtiva('ALUNOS')}
-            className={`p-4 rounded-xl text-left border transition-all flex flex-col justify-between ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-semibold border transition-colors flex items-center gap-2 ${
               secaoAtiva === 'ALUNOS'
-                ? 'bg-parish-950/60 border-parish-500/80 shadow-glow text-white'
-                : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                ? 'bg-carmel-800 text-carmel-50 border-carmel-800 shadow-sm'
+                : 'bg-carmel-50 text-carmel-700 border-carmel-200 hover:bg-carmel-100 hover:text-carmel-950'
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-heading font-bold text-xs uppercase tracking-wider flex items-center gap-2">
-                <Users className="w-4 h-4 text-sky-400" />
-                Registro de Alunos
-              </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                {alunos.length} alunos
-              </span>
-            </div>
-            <div className="text-xs text-slate-300 font-medium">
-              Ficha completa, CPF, contatos e faltas
-            </div>
+            <Users className={`w-4 h-4 ${secaoAtiva === 'ALUNOS' ? 'text-gold-300' : 'text-gold-700'}`} />
+            <span>Registro de Alunos</span>
+            <span
+              className={`text-xs font-mono px-2 py-0.5 rounded-full tabular-nums ${
+                secaoAtiva === 'ALUNOS'
+                  ? 'bg-carmel-950/50 text-gold-200'
+                  : 'bg-white text-carmel-700 border border-carmel-200'
+              }`}
+            >
+              {alunos.length}
+            </span>
           </button>
 
-          {/* Card 3: Aulas Passadas */}
           <button
+            role="tab"
+            aria-selected={secaoAtiva === 'HISTORICO'}
             onClick={() => setSecaoAtiva('HISTORICO')}
-            className={`p-4 rounded-xl text-left border transition-all flex flex-col justify-between ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-semibold border transition-colors flex items-center gap-2 ${
               secaoAtiva === 'HISTORICO'
-                ? 'bg-parish-950/60 border-parish-500/80 shadow-glow text-white'
-                : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                ? 'bg-carmel-800 text-carmel-50 border-carmel-800 shadow-sm'
+                : 'bg-carmel-50 text-carmel-700 border-carmel-200 hover:bg-carmel-100 hover:text-carmel-950'
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-heading font-bold text-xs uppercase tracking-wider flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-amber-400" />
-                Aulas Passadas
-              </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                {totalAulasHistorico} encontros
-              </span>
-            </div>
-            <div className="text-xs text-slate-300 font-medium">
-              Temas abordados e alunos que faltaram
-            </div>
+            <BookOpen className={`w-4 h-4 ${secaoAtiva === 'HISTORICO' ? 'text-gold-300' : 'text-gold-700'}`} />
+            <span>Aulas Passadas</span>
+            <span
+              className={`text-xs font-mono px-2 py-0.5 rounded-full tabular-nums ${
+                secaoAtiva === 'HISTORICO'
+                  ? 'bg-carmel-950/50 text-gold-200'
+                  : 'bg-white text-carmel-700 border border-carmel-200'
+              }`}
+            >
+              {totalAulasHistorico}
+            </span>
           </button>
         </div>
       </div>
-
-      {/* 3. Conteúdo Dinâmico do Card Selecionado */}
 
       {/* SEÇÃO 1: AULA DO DIA & CHAMADA */}
       {secaoAtiva === 'AULA_DIA' && (
         <div className="space-y-6 animate-fadeIn">
           {turma.aulaAtiva ? (
-            /* Card de Aula Ativa / Projeção do PIN */
-            <div className="bg-slate-900 border-2 border-parish-500/50 rounded-2xl p-6 sm:p-8 shadow-glow relative overflow-hidden">
+            /* Card de Aula Ativa — Quadro Carmelita de Alta Visibilidade para Projeção */
+            <div className="bg-carmel-900 border border-gold-500/40 rounded-2xl p-6 sm:p-8 shadow-card text-carmel-50">
               <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
                 <div className="flex items-center gap-2">
-                  <span className="relative flex h-3.5 w-3.5">
+                  <span className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                   </span>
-                  <span className="font-heading font-bold text-sm uppercase tracking-wider text-emerald-400">
+                  <span className="font-semibold text-xs uppercase tracking-wider text-emerald-300">
                     Sessão de Chamada Aberta
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-200 font-mono bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-parish-400" />
+                  <span className="text-xs text-gold-200 font-mono bg-carmel-950/60 px-3 py-1.5 rounded-lg border border-gold-500/30 flex items-center gap-1.5 tabular-nums">
+                    <Clock className="w-4 h-4 text-gold-300" />
                     {tempoRestante}
                   </span>
                   <button
                     onClick={handleEncerrarAula}
                     disabled={actionLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-300 hover:text-white bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-100 hover:text-white bg-red-900/70 hover:bg-red-800 border border-red-400/30 rounded-lg transition-colors"
                   >
                     <Square className="w-3.5 h-3.5" />
                     Encerrar Chamada
@@ -323,58 +316,54 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                 </div>
               </div>
 
-              {/* Destaque Gigante do PIN para projeção na sala */}
-              <div className="text-center py-6 bg-slate-950/80 border border-slate-800 rounded-2xl my-4">
-                <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">
+              <div className="text-center py-7 bg-carmel-950/70 border border-gold-400/35 rounded-2xl my-4">
+                <div className="text-xs font-semibold text-gold-300 uppercase tracking-widest mb-2">
                   Código PIN de Presença do Aluno
                 </div>
-                <div className="font-heading text-6xl sm:text-8xl font-extrabold tracking-[0.2em] text-parish-300">
+                <div className="font-mono text-5xl sm:text-7xl font-bold tracking-[0.22em] text-gold-200 select-all">
                   {turma.aulaAtiva.pin}
                 </div>
-                <div className="mt-4 flex items-center justify-center gap-3">
+                <div className="mt-5 flex items-center justify-center gap-3">
                   <button
                     onClick={handleCopyPin}
-                    className="flex items-center gap-2 px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-xs font-semibold bg-carmel-800 hover:bg-carmel-700 text-carmel-50 border border-gold-400/40 rounded-lg transition-colors"
                   >
                     {copiedPin ? (
-                      <Check className="w-4 h-4 text-emerald-400" />
+                      <Check className="w-4 h-4 text-emerald-300" />
                     ) : (
-                      <Copy className="w-4 h-4" />
+                      <Copy className="w-4 h-4 text-gold-300" />
                     )}
                     <span>{copiedPin ? 'PIN Copiado!' : 'Copiar PIN'}</span>
                   </button>
                 </div>
               </div>
 
-              {/* Barra de Progresso de Presenças */}
-              <div className="mt-6 pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-300">
-                <span className="font-medium text-slate-200">
+              <div className="mt-5 pt-4 border-t border-gold-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-carmel-200">
+                <span className="font-medium text-carmel-50">
                   Tema: {turma.aulaAtiva.descricao || 'Encontro em andamento'}
                 </span>
-                <span className="font-semibold text-parish-300">
-                  {totalPresentes} de {alunos.length} catequizandos registraram presença (
-                  {percentualPresenca}%)
+                <span className="font-semibold text-gold-200 tabular-nums">
+                  {totalPresentes} de {alunos.length} catequizandos presentes ({percentualPresenca}%)
                 </span>
               </div>
             </div>
           ) : (
             /* Card para Iniciar Aula */
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-card">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-parish-400" />
-                <h3 className="font-heading font-bold text-lg text-white">
+            <div className="bg-white border border-carmel-200 rounded-2xl p-6 sm:p-7 shadow-card">
+              <div className="flex items-center gap-2.5 mb-2">
+                <Sparkles className="w-5 h-5 text-gold-600" />
+                <h2 className="font-heading text-xl text-carmel-950">
                   Iniciar Encontro de Hoje & Habilitar Chamada
-                </h3>
+                </h2>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 mb-6 max-w-2xl">
-                Ao iniciar o encontro, o sistema gerará um código PIN exclusivo com tempo limite.
-                Os catequizandos poderão digitar esse PIN pelo smartphone para registrar presença
-                automaticamente.
+              <p className="text-sm text-carmel-600 mb-6 max-w-2xl">
+                Ao iniciar o encontro, o sistema gera um PIN exclusivo com tempo limite para que os
+                catequizandos registrem a presença pelo Portal do Aluno.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-carmel-800 mb-1.5">
                     Tema ou Conteúdo Ministrado no Encontro
                   </label>
                   <input
@@ -382,17 +371,17 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                     value={descricaoAula}
                     onChange={(e) => setDescricaoAula(e.target.value)}
                     placeholder="Ex: Oração do Pai Nosso e Mandamentos"
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:ring-2 focus:ring-parish-500/50 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 placeholder-carmel-400 focus:bg-white focus:border-gold-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-carmel-800 mb-1.5">
                     Duração da Sessão do PIN
                   </label>
                   <select
                     value={minutosValidade}
                     onChange={(e) => setMinutosValidade(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-parish-500/50 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 focus:bg-white focus:border-gold-500"
                   >
                     <option value={30}>30 minutos</option>
                     <option value={45}>45 minutos</option>
@@ -406,7 +395,7 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
               <button
                 onClick={handleIniciarAula}
                 disabled={actionLoading}
-                className="px-6 py-3 rounded-xl bg-parish-600 hover:bg-parish-500 text-white font-semibold text-sm shadow-md flex items-center gap-2.5 transition-all disabled:opacity-50"
+                className="px-5 py-2.5 rounded-lg bg-carmel-800 hover:bg-carmel-700 text-carmel-50 font-semibold text-sm shadow-sm flex items-center gap-2 transition-colors disabled:opacity-50"
               >
                 <Play className="w-4 h-4 fill-current" />
                 <span>{actionLoading ? 'Gerando Sessão...' : 'Iniciar Encontro & Gerar PIN'}</span>
@@ -414,64 +403,64 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
             </div>
           )}
 
-          {/* Lista de Chamada em Tempo Real do Encontro */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-card">
-            <div className="flex items-center justify-between mb-4">
+          {/* Lista de Chamada */}
+          <div className="bg-white border border-carmel-200 rounded-2xl p-5 sm:p-6 shadow-card">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
               <div>
-                <h3 className="font-heading font-bold text-base text-white flex items-center gap-2">
-                  <Users className="w-4 h-4 text-parish-400" />
+                <h2 className="font-heading text-lg text-carmel-950 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-gold-700" />
                   {turma.aulaAtiva
                     ? 'Presenças no Encontro Ao Vivo'
                     : 'Lista de Presença do Último Encontro'}
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                </h2>
+                <p className="text-xs text-carmel-600 mt-0.5 tabular-nums">
                   {totalPresentes} presentes • {Math.max(0, alunos.length - totalPresentes)} ausentes
                 </p>
               </div>
 
-              <div className="text-xs text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hidden sm:block">
-                Clique em Presente / Falta para registrar ou ajustar a chamada
+              <div className="text-xs text-carmel-600 bg-carmel-50 px-3 py-1.5 rounded-lg border border-carmel-200">
+                Clique no botão ao lado de cada aluno para ajustar a chamada
               </div>
             </div>
 
             {loadingAlunos ? (
-              <div className="text-center py-12 text-slate-400 text-xs flex items-center justify-center gap-2">
-                <RefreshCw className="w-4 h-4 animate-spin text-parish-400" />
+              <div className="text-center py-12 text-carmel-600 text-xs flex items-center justify-center gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin text-gold-700" />
                 Carregando catequizandos da turma...
               </div>
             ) : alunos.length === 0 ? (
-              <div className="text-center py-12 bg-slate-950/40 border border-slate-800 rounded-xl text-slate-400 text-xs">
+              <div className="text-center py-12 bg-carmel-50 border border-carmel-200 rounded-xl text-carmel-600 text-sm">
                 Nenhum catequizando matriculado nesta turma até o momento.
               </div>
             ) : (
-              <div className="border border-slate-800 rounded-xl overflow-hidden divide-y divide-slate-800 bg-slate-950/60">
+              <div className="border border-carmel-200 rounded-xl overflow-hidden divide-y divide-carmel-100">
                 {alunos.map((aluno) => {
                   const isPresente = aluno.presencaNaAula;
                   return (
                     <div
                       key={aluno.matricula}
-                      className="p-3.5 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-900/60 transition-colors"
+                      className="p-3.5 sm:px-4 flex items-center justify-between gap-3 bg-white hover:bg-carmel-50/70 transition-colors"
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm text-slate-200 truncate">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm text-carmel-950 truncate">
                             {aluno.nome}
                           </span>
                           {isPresente && (
-                            <span className="px-2 py-0.5 text-[10px] font-semibold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
-                              {aluno.origemPresenca === 'PIN' ? '✓ via PIN' : '✓ Manual'}
+                            <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+                              {aluno.origemPresenca === 'PIN' ? 'Via PIN' : 'Manual'}
                             </span>
                           )}
                         </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          Matrícula: #{aluno.matricula} • CPF: {aluno.cpf} • Faltas no ano:{' '}
+                        <div className="text-xs text-carmel-600 mt-0.5 tabular-nums">
+                          Matrícula #{aluno.matricula} • CPF {aluno.cpf} • Faltas no ano:{' '}
                           <strong
                             className={
                               aluno.totalFaltas >= 5
-                                ? 'text-red-400'
+                                ? 'text-red-700'
                                 : aluno.totalFaltas >= 3
-                                ? 'text-amber-400'
-                                : 'text-emerald-400'
+                                ? 'text-amber-700'
+                                : 'text-emerald-700'
                             }
                           >
                             {aluno.totalFaltas}
@@ -479,23 +468,22 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
                         </div>
                       </div>
 
-                      {/* Botão de Toggle de Presença */}
                       <button
                         onClick={() => handleTogglePresenca(aluno)}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border ${
                           isPresente
-                            ? 'bg-emerald-600/30 text-emerald-200 border border-emerald-500/50 hover:bg-emerald-600/40'
-                            : 'bg-slate-800 text-slate-400 border border-slate-700/60 hover:border-slate-600 hover:text-slate-200'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                            : 'bg-carmel-50 text-carmel-700 border-carmel-200 hover:bg-carmel-100 hover:text-carmel-950'
                         }`}
                       >
                         {isPresente ? (
                           <>
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
                             <span>Presente</span>
                           </>
                         ) : (
                           <>
-                            <XCircle className="w-3.5 h-3.5 text-slate-500" />
+                            <XCircle className="w-3.5 h-3.5 text-carmel-500" />
                             <span>Falta</span>
                           </>
                         )}
@@ -509,16 +497,16 @@ export const TurmaPaginaView: React.FC<TurmaPaginaViewProps> = ({
         </div>
       )}
 
-      {/* SEÇÃO 2: REGISTRO COMPLETO DE ALUNOS (Ficha, CPF, Contatos, Faltas Acumuladas) */}
+      {/* SEÇÃO 2: REGISTRO COMPLETO DE ALUNOS */}
       {secaoAtiva === 'ALUNOS' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-card">
+        <div className="bg-white border border-carmel-200 rounded-2xl p-5 sm:p-6 shadow-card">
           <TurmaAlunosTab alunos={alunos} turmaNome={turma.nomeTurma} />
         </div>
       )}
 
-      {/* SEÇÃO 3: HISTÓRICO DE AULAS PASSADAS & ALUNOS QUE FALTARAM */}
+      {/* SEÇÃO 3: HISTÓRICO DE AULAS PASSADAS */}
       {secaoAtiva === 'HISTORICO' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-card">
+        <div className="bg-white border border-carmel-200 rounded-2xl p-5 sm:p-6 shadow-card">
           <TurmaHistoricoTab aulas={turma.aulasHistorico || []} turmaNome={turma.nomeTurma} />
         </div>
       )}

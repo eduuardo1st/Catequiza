@@ -16,6 +16,10 @@ export interface DadosDetalhamentoMatricula {
   matriculaCatequizando: number;
   idTurma: number;
   statusMatricula: string;
+  nomeCatequizando?: string;
+  cpfCatequizando?: string;
+  nomeTurma?: string;
+  anoLetivoTurma?: number;
 }
 
 export interface MatriculaComDetalhes extends DadosDetalhamentoMatricula {

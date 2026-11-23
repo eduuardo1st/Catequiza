@@ -72,13 +72,11 @@ export const EditarMatriculaModal: React.FC<EditarMatriculaModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      // 1. Atualizar a matrícula atual como TRANSFERIDA
       await matriculaService.atualizar({
         id: matricula.id,
         statusMatricula: 'TRANSFERIDA',
       });
 
-      // 2. Criar a nova matrícula como ATIVA na turma de destino
       await matriculaService.cadastrar({
         matriculaCatequizando: matricula.matriculaCatequizando,
         idTurma: Number(novaTurmaId),
@@ -95,39 +93,43 @@ export const EditarMatriculaModal: React.FC<EditarMatriculaModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-7 shadow-2xl space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-carmel-950/60 backdrop-blur-[2px] animate-fadeIn">
+      <div className="relative w-full max-w-lg bg-white border border-carmel-200 rounded-2xl p-6 sm:p-7 shadow-modal space-y-5">
+        <div className="flex items-center justify-between border-b border-carmel-200 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-parish-600/20 text-parish-400 border border-parish-500/30 flex items-center justify-center">
-              {modo === 'STATUS' ? <RefreshCw className="w-5 h-5" /> : <ArrowRightLeft className="w-5 h-5" />}
+            <div className="w-10 h-10 rounded-xl bg-carmel-100 text-carmel-800 border border-carmel-200 flex items-center justify-center">
+              {modo === 'STATUS' ? (
+                <RefreshCw className="w-5 h-5" />
+              ) : (
+                <ArrowRightLeft className="w-5 h-5" />
+              )}
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white font-heading">
-                {modo === 'STATUS' ? 'Alterar Status da Matrícula' : 'Transferir Aluno de Turma'}
+              <h2 className="text-xl text-carmel-950 font-heading">
+                {modo === 'STATUS' ? 'Alterar Status da Matrícula' : 'Transferir de Turma'}
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-carmel-600">
                 {matricula.nomeCatequizando || `Catequizando #${matricula.matriculaCatequizando}`}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-2 text-carmel-500 hover:text-carmel-950 rounded-lg hover:bg-carmel-100 transition-colors"
+            aria-label="Fechar"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Abas internas: Alterar Status vs Transferir */}
-        <div className="flex gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-semibold">
+        <div className="flex gap-1.5 p-1 bg-carmel-50 rounded-xl border border-carmel-200 text-xs font-semibold">
           <button
             type="button"
             onClick={() => setModo('STATUS')}
-            className={`flex-1 py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 ${
               modo === 'STATUS'
-                ? 'bg-parish-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                ? 'bg-carmel-800 text-carmel-50 shadow-sm'
+                : 'text-carmel-700 hover:text-carmel-950 hover:bg-white'
             }`}
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -136,10 +138,10 @@ export const EditarMatriculaModal: React.FC<EditarMatriculaModalProps> = ({
           <button
             type="button"
             onClick={() => setModo('TRANSFERIR')}
-            className={`flex-1 py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 ${
               modo === 'TRANSFERIR'
-                ? 'bg-parish-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                ? 'bg-carmel-800 text-carmel-50 shadow-sm'
+                : 'text-carmel-700 hover:text-carmel-950 hover:bg-white'
             }`}
           >
             <ArrowRightLeft className="w-3.5 h-3.5" />
@@ -151,24 +153,28 @@ export const EditarMatriculaModal: React.FC<EditarMatriculaModalProps> = ({
 
         {modo === 'STATUS' ? (
           <form onSubmit={handleSalvarStatus} className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
-              <div className="text-slate-400">
-                Turma atual: <strong className="text-white">{matricula.nomeTurma || `Turma #${matricula.idTurma}`}</strong>
+            <div className="p-3.5 rounded-xl bg-carmel-50 border border-carmel-200 text-xs space-y-1">
+              <div className="text-carmel-600">
+                Turma atual:{' '}
+                <strong className="text-carmel-950">
+                  {matricula.nomeTurma || `Turma #${matricula.idTurma}`}
+                </strong>
               </div>
-              <div className="text-slate-400">
-                Situação atual: <span className="font-semibold text-parish-300">{matricula.statusMatricula}</span>
+              <div className="text-carmel-600">
+                Situação atual:{' '}
+                <span className="font-semibold text-gold-700">{matricula.statusMatricula}</span>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-parish-400" />
+              <label className="block text-xs font-semibold text-carmel-800 mb-1.5 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-gold-700" />
                 <span>Nova Situação Cadastral *</span>
               </label>
               <select
                 value={novoStatus}
                 onChange={(e) => setNovoStatus(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-xs sm:text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
+                className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 focus:bg-white focus:border-gold-500"
                 required
               >
                 <option value="ATIVA">ATIVA (Participando dos encontros)</option>
@@ -178,19 +184,19 @@ export const EditarMatriculaModal: React.FC<EditarMatriculaModalProps> = ({
               </select>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-carmel-200">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 text-xs font-semibold text-carmel-700 hover:text-carmel-950 rounded-lg hover:bg-carmel-100 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-parish-600 hover:bg-parish-500 text-white font-semibold text-xs transition-all shadow-sm disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-carmel-800 hover:bg-carmel-700 text-carmel-50 font-semibold text-xs transition-colors shadow-sm disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>
@@ -208,24 +214,28 @@ export const EditarMatriculaModal: React.FC<EditarMatriculaModalProps> = ({
           </form>
         ) : (
           <form onSubmit={handleTransferirTurma} className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
-              <div className="text-slate-400">
-                Turma de Origem: <strong className="text-white">{matricula.nomeTurma || `Turma #${matricula.idTurma}`}</strong>
+            <div className="p-3.5 rounded-xl bg-carmel-50 border border-carmel-200 text-xs space-y-1">
+              <div className="text-carmel-600">
+                Turma de Origem:{' '}
+                <strong className="text-carmel-950">
+                  {matricula.nomeTurma || `Turma #${matricula.idTurma}`}
+                </strong>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Ao transferir, a matrícula de origem será registrada como <strong>TRANSFERIDA</strong> e uma nova matrícula ativa será criada na turma escolhida abaixo.
+              <p className="text-[11px] text-carmel-600 mt-1">
+                A matrícula atual será marcada como <strong>TRANSFERIDA</strong> e uma nova
+                matrícula ativa será criada na turma escolhida.
               </p>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <ArrowRightLeft className="w-3.5 h-3.5 text-parish-400" />
+              <label className="block text-xs font-semibold text-carmel-800 mb-1.5 flex items-center gap-1.5">
+                <ArrowRightLeft className="w-3.5 h-3.5 text-gold-700" />
                 <span>Nova Turma de Destino *</span>
               </label>
               <select
                 value={novaTurmaId}
                 onChange={(e) => setNovaTurmaId(e.target.value ? Number(e.target.value) : '')}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-xs sm:text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
+                className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 focus:bg-white focus:border-gold-500"
                 required
               >
                 <option value="">Selecione a turma de destino...</option>
@@ -239,19 +249,19 @@ export const EditarMatriculaModal: React.FC<EditarMatriculaModalProps> = ({
               </select>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-carmel-200">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 text-xs font-semibold text-carmel-700 hover:text-carmel-950 rounded-lg hover:bg-carmel-100 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-parish-600 hover:bg-parish-500 text-white font-semibold text-xs transition-all shadow-sm disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-carmel-800 hover:bg-carmel-700 text-carmel-50 font-semibold text-xs transition-colors shadow-sm disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>

@@ -3,71 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catequiza. — Portal do Catequizando</title>
+  <link rel="icon" type="image/png" href="Logo/brasao-carmo.png">
+  <title>Catequiza. — Portal do Aluno | Paróquia Nossa Senhora do Carmo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&family=Marcellus&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
 
-  <!-- Navegação de Abas do Portal do Aluno -->
-  <nav class="nav-tabs">
-    <button class="nav-tab active" onclick="switchTab('tab-pin', this)">
-      <span>1. Presença com PIN</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('tab-frequencia', this)">
-      <span>2. Consultar Frequência</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('tab-fila', this)">
-      <span>3. Fila de Espera</span>
-    </button>
-  </nav>
+  <header class="parish-topbar">
+    <div class="parish-topbar-inner">
+      <div class="brand-lockup">
+        <div class="brand-seal">
+          <img src="Logo/brasao-carmo.png" alt="Brasão da Paróquia Nossa Senhora do Carmo">
+        </div>
+        <div>
+          <div class="brand-title">Catequiza<span>.</span></div>
+          <div class="brand-subtitle">Paróquia Nossa Senhora do Carmo</div>
+        </div>
+      </div>
+    </div>
 
-  <!-- ABA 1: REGISTRAR PRESENÇA COM PIN -->
-  <section id="tab-pin" class="view active">
+    <nav class="nav-tabs" aria-label="Serviços do Portal do Aluno">
+      <button type="button" class="nav-tab active" onclick="switchTab('tab-pin', this)">
+        Presença por PIN
+      </button>
+      <button type="button" class="nav-tab" onclick="switchTab('tab-frequencia', this)">
+        Frequência
+      </button>
+      <button type="button" class="nav-tab" onclick="switchTab('tab-fila', this)">
+        Fila de Espera
+      </button>
+    </nav>
+  </header>
+
+  <!-- ABA 1: PRESENÇA POR PIN -->
+  <main id="tab-pin" class="view active">
     <div class="public-view">
       <div class="public-header">
-        <img src="Logo/LogoAzul.jpeg" alt="Catequiza." class="public-logo" onerror="this.style.display='none'">
-        <h1 class="public-title">Catequiza<span style="color:var(--text-primary)">.</span></h1>
-        <p class="public-subtitle">Digite o PIN projetado pelo catequista na sala para confirmar sua presença</p>
+        <img src="Logo/brasao-carmo.png" alt="Brasão Paróquia Nossa Senhora do Carmo" class="public-emblem">
+        <h1 class="public-title">Confirmar Presença</h1>
+        <p class="public-subtitle">Selecione seu nome e informe o código PIN exibido pelo catequista durante o encontro.</p>
       </div>
 
       <div class="search-card">
         <div class="form-group">
-          <label class="form-label" for="pin-aluno-select">Seu Nome / Matrícula</label>
+          <label class="form-label" for="pin-aluno-select">Catequizando (Nome / Matrícula)</label>
           <select class="form-select" id="pin-aluno-select">
             <option value="">Carregando catequizandos...</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="pin-code">Código PIN da Aula</label>
+          <label class="form-label" for="pin-code">Código PIN do Encontro</label>
           <input
             type="text"
-            class="form-input"
+            class="form-input pin-input"
             id="pin-code"
-            placeholder="Ex: EUC401"
+            placeholder="EUC401"
             maxlength="10"
-            style="text-transform: uppercase; font-family: monospace; font-size: 1.25rem; font-weight: 700; letter-spacing: 0.15em; text-align: center;"
+            autocomplete="off"
           >
         </div>
 
-        <button class="btn-search" id="btn-registrar-pin" onclick="registrarPresencaPin()">
-          Confirmar Presença Agora
+        <button type="button" class="btn-search" id="btn-registrar-pin" onclick="registrarPresencaPin()">
+          Confirmar Presença
         </button>
 
-        <div id="pin-feedback" class="progress-warning" style="display: none; margin-top: 16px;"></div>
+        <div id="pin-feedback" class="feedback-box" style="display: none;"></div>
       </div>
     </div>
-  </section>
+  </main>
 
-  <!-- ABA 2: CONSULTAR FREQUÊNCIA E FALTAS -->
+  <!-- ABA 2: CONSULTAR FREQUÊNCIA -->
   <section id="tab-frequencia" class="view">
     <div class="public-view">
       <div class="public-header">
         <h1 class="public-title">Consulta de Frequência</h1>
-        <p class="public-subtitle">Acompanhe presenças, faltas e situação na turma pastoral</p>
+        <p class="public-subtitle">Acompanhe presenças, faltas e a situação do catequizando na turma pastoral.</p>
       </div>
 
       <div class="search-card">
@@ -78,7 +92,9 @@
           </select>
         </div>
 
-        <button class="btn-search" onclick="searchAbsences()">Consultar Situação</button>
+        <button type="button" class="btn-search" onclick="searchAbsences()">
+          Consultar Situação
+        </button>
       </div>
 
       <div class="result-card result-hidden" id="result-card">
@@ -95,7 +111,7 @@
             <div class="stat-label">Faltas</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" id="result-presences">0</div>
+            <div class="stat-value success" id="result-presences">0</div>
             <div class="stat-label">Presenças</div>
           </div>
           <div class="stat-item">
@@ -103,26 +119,26 @@
             <div class="stat-label">Frequência</div>
           </div>
         </div>
-        <div class="progress-section">
+        <div>
           <div class="progress-header">
-            <span class="progress-text">Limite de faltas no ciclo</span>
-            <span class="progress-text"><strong id="result-limit-text">0</strong> / 5</span>
+            <span>Limite de faltas no ciclo</span>
+            <span><strong id="result-limit-text">0</strong> / 5</span>
           </div>
           <div class="progress-bar">
             <div class="progress-fill safe" id="result-progress" style="width: 0%"></div>
           </div>
-          <div class="progress-warning warn" id="result-warning" style="display: none;"></div>
+          <div class="feedback-box warn" id="result-warning" style="display: none;"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ABA 3: FILA DE ESPERA SACRAMENTAL -->
+  <!-- ABA 3: FILA DE ESPERA -->
   <section id="tab-fila" class="view">
     <div class="public-view">
       <div class="public-header">
-        <h1 class="public-title">Fila de Espera</h1>
-        <p class="public-subtitle">Solicite inscrição para o próximo ciclo de Batismo, 1ª Eucaristia ou Crisma</p>
+        <h1 class="public-title">Fila de Espera Sacramental</h1>
+        <p class="public-subtitle">Solicite vaga para o próximo ciclo de Batismo, 1ª Eucaristia, Crisma ou Perseverança.</p>
       </div>
 
       <div class="search-card">
@@ -143,14 +159,19 @@
           </select>
         </div>
 
-        <button class="btn-search" id="btn-enviar-fila" onclick="solicitarFilaEspera()">
+        <button type="button" class="btn-search" id="btn-enviar-fila" onclick="solicitarFilaEspera()">
           Enviar Solicitação de Vaga
         </button>
 
-        <div id="fila-feedback" class="progress-warning" style="display: none; margin-top: 16px;"></div>
+        <div id="fila-feedback" class="feedback-box" style="display: none;"></div>
       </div>
     </div>
   </section>
+
+  <footer class="parish-footer">
+    <div><strong>Arquidiocese de Brasília</strong> • Paróquia Nossa Senhora do Carmo</div>
+    <div class="parish-footer-meta">QSF 05/07 AE 2 • Taguatinga Sul • Secretaria e WhatsApp: (61) 3356-7489</div>
+  </footer>
 
   <script>
     const API_URL = 'https://catequiza-backend-dev.onrender.com';
@@ -210,7 +231,7 @@
       const feedback = document.getElementById('pin-feedback');
 
       if (!matricula || !pin) {
-        feedback.className = 'progress-warning danger';
+        feedback.className = 'feedback-box danger';
         feedback.textContent = 'Selecione seu nome e digite o código PIN da aula.';
         feedback.style.display = 'flex';
         return;
@@ -218,7 +239,7 @@
 
       const aula = dbAulas.find(a => a.pin && a.pin.toUpperCase() === pin);
       if (!aula) {
-        feedback.className = 'progress-warning danger';
+        feedback.className = 'feedback-box danger';
         feedback.textContent = 'PIN não encontrado. Verifique o código projetado pelo catequista.';
         feedback.style.display = 'flex';
         return;
@@ -238,10 +259,8 @@
         // Fallback registrado
       }
 
-      feedback.className = 'progress-warning warn';
-      feedback.style.borderColor = 'rgba(34, 197, 94, 0.4)';
-      feedback.style.color = '#22C55E';
-      feedback.innerHTML = `✓ Presença confirmada com sucesso na aula <strong>${aula.descricaoConteudo || aula.pin}</strong>!`;
+      feedback.className = 'feedback-box success';
+      feedback.innerHTML = `Presença confirmada com sucesso no encontro: <strong>${aula.descricaoConteudo || aula.pin}</strong>.`;
       feedback.style.display = 'flex';
       document.getElementById('pin-code').value = '';
     }
@@ -289,12 +308,12 @@
       if (absences === 0) {
         warning.style.display = 'none';
       } else if (absences >= limit) {
-        warning.className = 'progress-warning danger';
+        warning.className = 'feedback-box danger';
         warning.innerHTML = `Limite crítico atingido: <strong>${absences} faltas</strong> registradas no ciclo.`;
         warning.style.display = 'flex';
       } else {
-        warning.className = 'progress-warning warn';
-        warning.innerHTML = `Atenção: O catequizando possui <strong>${absences} falta(s)</strong> de um limite de ${limit}.`;
+        warning.className = 'feedback-box warn';
+        warning.innerHTML = `Atenção: o catequizando possui <strong>${absences} falta(s)</strong> de um limite de ${limit}.`;
         warning.style.display = 'flex';
       }
 
@@ -311,7 +330,7 @@
       const feedback = document.getElementById('fila-feedback');
 
       if (!matricula) {
-        feedback.className = 'progress-warning danger';
+        feedback.className = 'feedback-box danger';
         feedback.textContent = 'Selecione o catequizando para enviar a solicitação.';
         feedback.style.display = 'flex';
         return;
@@ -328,10 +347,8 @@
         });
 
         if (res.ok) {
-          feedback.className = 'progress-warning warn';
-          feedback.style.borderColor = 'rgba(34, 197, 94, 0.4)';
-          feedback.style.color = '#22C55E';
-          feedback.innerHTML = `✓ Solicitação para <strong>${sacramento}</strong> registrada com sucesso na fila da secretaria!`;
+          feedback.className = 'feedback-box success';
+          feedback.innerHTML = `Solicitação para <strong>${sacramento}</strong> registrada com sucesso na secretaria paroquial.`;
           feedback.style.display = 'flex';
           return;
         }
@@ -339,8 +356,8 @@
         // fallback message
       }
 
-      feedback.className = 'progress-warning warn';
-      feedback.innerHTML = `Solicitação para <strong>${sacramento}</strong> enviada para triagem paroquial.`;
+      feedback.className = 'feedback-box warn';
+      feedback.innerHTML = `Solicitação para <strong>${sacramento}</strong> encaminhada para triagem paroquial.`;
       feedback.style.display = 'flex';
     }
 

@@ -4,28 +4,49 @@
 
 @layer base {
   :root {
-    --color-parish-primary: #03549f;
-    --color-parish-accent: #0e86e5;
+    --color-parish-ground: #FAF6EE;
+    --color-parish-surface: #FFFFFF;
+    --color-parish-brown: #3B2112;
+    --color-parish-brown-action: #4A2916;
+    --color-parish-gold: #AF915D;
+    --color-parish-gold-text: #75592C;
+    --color-parish-ink: #26150B;
+    --color-parish-ink-muted: #665040;
+    --color-parish-border: #E5DAC8;
+  }
+
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-slate-950 text-slate-100 font-sans;
-    color-scheme: dark;
+    @apply bg-carmel-50 text-carmel-950 font-sans;
+    caret-color: #75592C;
   }
 
-  /* Custom Scrollbars */
+  input, select, textarea, button {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60;
+  }
+
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: #F3EBD9;
   }
   ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #CBB9A6;
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #AF915D;
+  }
+}
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }

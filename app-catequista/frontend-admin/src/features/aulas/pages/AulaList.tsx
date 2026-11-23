@@ -7,21 +7,28 @@ import { NovaAulaModal } from '../components/NovaAulaModal';
 import { ProjetarPinModal } from '../components/ProjetarPinModal';
 import { EditarAulaModal } from '../components/EditarAulaModal';
 import { ApiErrorAlert } from '../../../components/ApiErrorAlert';
-import { 
-  Sparkles, 
-  Search, 
-  Calendar, 
-  Trash2, 
-  Loader2, 
-  Radio, 
-  Copy, 
-  Check, 
-  Maximize2, 
-  BookOpen, 
-  Edit2, 
-  Plus, 
-  GraduationCap
+import {
+  Sparkles,
+  Search,
+  Calendar,
+  Trash2,
+  Loader2,
+  Radio,
+  Copy,
+  Check,
+  Maximize2,
+  BookOpen,
+  Edit2,
+  Plus,
+  GraduationCap,
 } from 'lucide-react';
+
+function formatarDataBR(isoDate?: string): string {
+  if (!isoDate) return '—';
+  const partes = isoDate.split('T')[0].split('-');
+  if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  return isoDate;
+}
 
 export const AulaList: React.FC = () => {
   const [aulas, setAulas] = useState<AulaComDetalhes[]>([]);
@@ -30,7 +37,7 @@ export const AulaList: React.FC = () => {
   const [busca, setBusca] = useState('');
   const [turmaFiltro, setTurmaFiltro] = useState<string>('TODAS');
   const [statusFiltro, setStatusFiltro] = useState<'TODOS' | 'AO_VIVO' | 'ENCERRADAS'>('TODOS');
-  
+
   const [isNovaModalOpen, setIsNovaModalOpen] = useState(false);
   const [aulaProjetando, setAulaProjetando] = useState<AulaComDetalhes | null>(null);
   const [aulaEmEdicao, setAulaEmEdicao] = useState<AulaComDetalhes | null>(null);
@@ -49,7 +56,7 @@ export const AulaList: React.FC = () => {
 
       setTurmas(turmasData);
 
-      const agora = new Date().getTime();
+      const agora = Date.now();
       const enriquecidas: AulaComDetalhes[] = aulasData.map((aula) => {
         const turma = turmasData.find((t) => t.id === aula.idTurma);
         const expira = aula.horarioExpiracao ? new Date(aula.horarioExpiracao).getTime() : 0;
@@ -63,7 +70,6 @@ export const AulaList: React.FC = () => {
         };
       });
 
-      // Ordena por data decrescente
       enriquecidas.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
 
       setAulas(enriquecidas);
@@ -113,11 +119,9 @@ export const AulaList: React.FC = () => {
       isAtiva: true,
     };
     setAulas((prev) => [detalhada, ...prev]);
-    // Abre automaticamente a projeção do PIN para a aula recém-iniciada!
     setAulaProjetando(detalhada);
   };
 
-  // Contadores analíticos
   const totalAulas = aulas.length;
   const aoVivoCount = aulas.filter((a) => a.isAtiva).length;
   const encerradasCount = totalAulas - aoVivoCount;
@@ -129,11 +133,11 @@ export const AulaList: React.FC = () => {
         !termo ||
         aula.pin.toLowerCase().includes(termo) ||
         aula.data.includes(termo) ||
+        formatarDataBR(aula.data).includes(termo) ||
         (aula.descricaoConteudo && aula.descricaoConteudo.toLowerCase().includes(termo)) ||
         (aula.nomeTurma && aula.nomeTurma.toLowerCase().includes(termo));
 
-      const matchesTurma =
-        turmaFiltro === 'TODAS' || aula.idTurma.toString() === turmaFiltro;
+      const matchesTurma = turmaFiltro === 'TODAS' || aula.idTurma.toString() === turmaFiltro;
 
       const matchesStatus =
         statusFiltro === 'TODOS' ||
@@ -146,21 +150,20 @@ export const AulaList: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
-      {/* 1. Header do Módulo */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="font-heading font-extrabold text-2xl text-white tracking-tight flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-parish-400" />
+          <h1 className="font-heading text-2xl sm:text-3xl text-carmel-950 tracking-tight flex items-center gap-2.5">
+            <Sparkles className="w-6 h-6 text-gold-600 shrink-0" />
             <span>Aulas & PIN de Chamada</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Sessões de presença em tempo real, geração de PIN dinâmico e registro histórico dos encontros
+          <p className="text-sm text-carmel-600 mt-1">
+            Sessões de presença em tempo real, projeção de PIN na sala e histórico de encontros.
           </p>
         </div>
 
         <button
           onClick={() => setIsNovaModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-parish-600 hover:bg-parish-500 text-white font-semibold text-xs transition-all shadow-sm self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-carmel-800 hover:bg-carmel-700 text-carmel-50 font-semibold text-sm transition-colors shadow-sm self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Iniciar Encontro & PIN</span>
@@ -169,57 +172,65 @@ export const AulaList: React.FC = () => {
 
       {erro && <ApiErrorAlert error={erro} onRetry={carregarDados} />}
 
-      {/* 2. Cards de Resumo */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between">
+      {/* Resumo */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 tabular-nums">
+        <div className="bg-white border border-carmel-200 rounded-xl p-4 shadow-card flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total de Encontros</div>
-            <div className="font-heading font-extrabold text-xl text-white mt-1">{totalAulas}</div>
+            <div className="text-[11px] font-semibold text-carmel-600 uppercase tracking-wider">
+              Total de Encontros
+            </div>
+            <div className="font-sans font-bold text-2xl text-carmel-950 mt-1">{totalAulas}</div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-carmel-50 border border-carmel-200 text-carmel-700 flex items-center justify-center">
             <Calendar className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between">
+        <div className="bg-white border border-carmel-200 rounded-xl p-4 shadow-card flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Sessões Ao Vivo (PIN Ativo)</div>
-            <div className="font-heading font-extrabold text-xl text-emerald-400 mt-1">{aoVivoCount}</div>
+            <div className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">
+              Sessões Ao Vivo
+            </div>
+            <div className="font-sans font-bold text-2xl text-emerald-700 mt-1">{aoVivoCount}</div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-            <Radio className="w-5 h-5 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center">
+            <Radio className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between">
+        <div className="bg-white border border-carmel-200 rounded-xl p-4 shadow-card flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Encontros Concluídos</div>
-            <div className="font-heading font-extrabold text-xl text-slate-300 mt-1">{encerradasCount}</div>
+            <div className="text-[11px] font-semibold text-carmel-600 uppercase tracking-wider">
+              Encontros Encerrados
+            </div>
+            <div className="font-sans font-bold text-2xl text-carmel-800 mt-1">
+              {encerradasCount}
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-carmel-50 border border-carmel-200 text-gold-700 flex items-center justify-center">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
       </div>
 
-      {/* 3. Filtros e Busca */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-1 bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-2.5">
-          <Search className="w-4 h-4 text-slate-500 ml-1 shrink-0" />
+      {/* Filtros e Busca */}
+      <div className="flex flex-col lg:flex-row gap-3">
+        <div className="flex-1 bg-white border border-carmel-200 rounded-xl px-3.5 py-2.5 shadow-card flex items-center gap-2.5 focus-within:border-gold-500">
+          <Search className="w-4 h-4 text-carmel-400 shrink-0" />
           <input
             type="text"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
             placeholder="Buscar por PIN, tema do encontro, data ou turma..."
-            className="w-full bg-transparent border-none text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none"
+            className="w-full bg-transparent border-none text-sm text-carmel-950 placeholder-carmel-400 focus:outline-none focus:ring-0"
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={turmaFiltro}
             onChange={(e) => setTurmaFiltro(e.target.value)}
-            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
+            className="px-3 py-2 bg-white border border-carmel-200 rounded-xl text-xs font-semibold text-carmel-800 focus:border-gold-500 shadow-card"
           >
             <option value="TODAS">Todas as Turmas</option>
             {turmas.map((t) => (
@@ -229,15 +240,15 @@ export const AulaList: React.FC = () => {
             ))}
           </select>
 
-          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-white border border-carmel-200 p-1 rounded-xl shadow-card">
             {(['TODOS', 'AO_VIVO', 'ENCERRADAS'] as const).map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFiltro(st)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                   statusFiltro === st
-                    ? 'bg-parish-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-carmel-800 text-carmel-50'
+                    : 'text-carmel-600 hover:text-carmel-950 hover:bg-carmel-50'
                 }`}
               >
                 {st === 'TODOS' ? 'Todos' : st === 'AO_VIVO' ? 'Ao Vivo' : 'Encerradas'}
@@ -247,22 +258,30 @@ export const AulaList: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Lista de Aulas & PIN */}
+      {/* Lista de Aulas & PIN */}
       {isLoading ? (
-        <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-3 bg-slate-900 border border-slate-800 rounded-2xl">
-          <Loader2 className="w-7 h-7 animate-spin text-parish-500" />
-          <span className="text-xs font-medium">Carregando sessões e histórico de aulas...</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <div
+              key={n}
+              className="bg-white border border-carmel-200 rounded-2xl p-5 shadow-card animate-pulse space-y-4"
+            >
+              <div className="h-5 bg-carmel-100 rounded w-1/2" />
+              <div className="h-4 bg-carmel-100 rounded w-3/4" />
+              <div className="h-16 bg-carmel-100 rounded-xl" />
+            </div>
+          ))}
         </div>
       ) : aulasFiltradas.length === 0 ? (
-        <div className="py-20 text-center bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto">
+        <div className="py-16 text-center bg-white border border-carmel-200 rounded-2xl p-8 space-y-3 shadow-card">
+          <div className="w-12 h-12 rounded-2xl bg-carmel-100 text-gold-700 flex items-center justify-center mx-auto">
             <GraduationCap className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-bold text-slate-200">Nenhum encontro encontrado</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <h3 className="text-base font-bold text-carmel-950">Nenhum encontro encontrado</h3>
+          <p className="text-sm text-carmel-600 max-w-sm mx-auto">
             {busca || statusFiltro !== 'TODOS' || turmaFiltro !== 'TODAS'
               ? 'Nenhum encontro pastoral corresponde aos filtros aplicados.'
-              : 'Ainda não há aulas registradas. Clique em "Iniciar Encontro & PIN" para abrir a primeira sessão de chamada.'}
+              : 'Ainda não há aulas registradas. Clique em "Iniciar Encontro & PIN" para abrir a primeira sessão.'}
           </p>
         </div>
       ) : (
@@ -270,47 +289,44 @@ export const AulaList: React.FC = () => {
           {aulasFiltradas.map((aula) => (
             <div
               key={aula.id}
-              className={`group relative bg-slate-900/90 border rounded-2xl p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between ${
-                aula.isAtiva
-                  ? 'border-emerald-500/50 hover:border-emerald-500 shadow-emerald-950/20'
-                  : 'border-slate-800 hover:border-slate-700'
+              className={`bg-white border rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col justify-between ${
+                aula.isAtiva ? 'border-emerald-300 ring-1 ring-emerald-200/70' : 'border-carmel-200'
               }`}
             >
               <div className="space-y-4">
-                {/* Header do Card */}
                 <div className="flex items-center justify-between gap-2">
                   {aula.isAtiva ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                      <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      <Radio className="w-3.5 h-3.5 text-emerald-700 animate-pulse" />
                       <span>AO VIVO • PIN ATIVO</span>
                     </span>
                   ) : (
-                    <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                    <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-carmel-100 text-carmel-700 border border-carmel-200">
                       ENCERRADA
                     </span>
                   )}
 
-                  <span className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
-                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                    <span>{aula.data}</span>
+                  <span className="flex items-center gap-1.5 text-xs text-carmel-600 font-mono tabular-nums">
+                    <Calendar className="w-3.5 h-3.5 text-gold-700" />
+                    <span>{formatarDataBR(aula.data)}</span>
                   </span>
                 </div>
 
-                {/* Turma e Conteúdo */}
                 <div>
-                  <h3 className="font-heading font-bold text-base text-white group-hover:text-parish-300 transition-colors">
+                  <h3 className="font-sans font-bold text-base text-carmel-950 leading-snug">
                     {aula.nomeTurma || `Turma #${aula.idTurma}`}
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                  <p className="text-xs text-carmel-600 mt-1 line-clamp-2">
                     {aula.descricaoConteudo || 'Encontro pastoral de catequese'}
                   </p>
                 </div>
 
-                {/* Box de PIN */}
-                <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
+                <div className="p-3.5 bg-carmel-50 border border-carmel-200 rounded-xl flex items-center justify-between gap-2">
                   <div>
-                    <div className="text-[10px] uppercase font-semibold text-slate-500">PIN da Chamada</div>
-                    <div className="font-mono font-extrabold text-2xl text-parish-300 tracking-wider">
+                    <div className="text-[10px] uppercase font-semibold tracking-wider text-carmel-600">
+                      PIN da Chamada
+                    </div>
+                    <div className="font-mono font-bold text-2xl text-carmel-900 tracking-wider tabular-nums">
                       {aula.pin}
                     </div>
                   </div>
@@ -318,11 +334,11 @@ export const AulaList: React.FC = () => {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => handleCopyPin(aula.pin, aula.id)}
-                      className="p-2 text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-850 rounded-lg border border-slate-800 transition-colors"
+                      className="p-2 text-carmel-700 hover:text-carmel-950 bg-white hover:bg-carmel-100 rounded-lg border border-carmel-200 transition-colors"
                       title="Copiar PIN"
                     >
                       {copiedPinId === aula.id ? (
-                        <Check className="w-4 h-4 text-emerald-400" />
+                        <Check className="w-4 h-4 text-emerald-700" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
@@ -330,26 +346,25 @@ export const AulaList: React.FC = () => {
 
                     <button
                       onClick={() => setAulaProjetando(aula)}
-                      className="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-semibold text-parish-300 hover:text-white bg-parish-950/80 hover:bg-parish-900 rounded-lg border border-parish-800/80 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-carmel-50 bg-carmel-800 hover:bg-carmel-700 rounded-lg transition-colors shadow-sm"
                       title="Projetar PIN em tela cheia na sala"
                     >
-                      <Maximize2 className="w-3.5 h-3.5" />
+                      <Maximize2 className="w-3.5 h-3.5 text-gold-300" />
                       <span>Projetar</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Footer do Card */}
-              <div className="mt-4 pt-3.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-mono text-[11px]">
+              <div className="mt-4 pt-3.5 border-t border-carmel-100 flex items-center justify-between text-xs">
+                <span className="text-carmel-500 font-mono text-[11px] tabular-nums">
                   Encontro #{aula.id}
                 </span>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => setAulaEmEdicao(aula)}
-                    className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                    className="p-1.5 text-carmel-600 hover:text-carmel-950 hover:bg-carmel-100 rounded-lg transition-colors"
                     title="Editar informações do encontro"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -358,11 +373,11 @@ export const AulaList: React.FC = () => {
                   <button
                     onClick={() => handleExcluir(aula.id, aula.pin)}
                     disabled={excluindoId === aula.id}
-                    className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
+                    className="p-1.5 text-carmel-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"
                     title="Excluir aula"
                   >
                     {excluindoId === aula.id ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-red-700" />
                     ) : (
                       <Trash2 className="w-3.5 h-3.5" />
                     )}
@@ -374,7 +389,6 @@ export const AulaList: React.FC = () => {
         </div>
       )}
 
-      {/* Modais */}
       <NovaAulaModal
         isOpen={isNovaModalOpen}
         onClose={() => setIsNovaModalOpen(false)}

@@ -59,17 +59,17 @@ export const CatequizandoForm: React.FC = () => {
       if (isEdicao && matricula) {
         await catequizandoService.atualizar({
           matricula: Number(matricula),
-          nome,
-          telefone,
-          email,
+          nome: nome.trim(),
+          telefone: telefone.trim(),
+          email: email.trim(),
         });
         setSucesso('Catequizando atualizado com sucesso!');
       } else {
         await catequizandoService.cadastrar({
-          nome,
-          cpf,
-          telefone,
-          email,
+          nome: nome.trim(),
+          cpf: cpf.trim(),
+          telefone: telefone.trim(),
+          email: email.trim(),
         });
         setSucesso('Catequizando cadastrado com sucesso!');
       }
@@ -92,27 +92,28 @@ export const CatequizandoForm: React.FC = () => {
 
   if (isLoadingDados) {
     return (
-      <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-3">
-        <Loader2 className="w-6 h-6 animate-spin text-parish-500" />
-        <span className="text-xs">Carregando dados cadastrais...</span>
+      <div className="max-w-2xl mx-auto py-20 flex flex-col items-center justify-center text-carmel-600 gap-3">
+        <Loader2 className="w-6 h-6 animate-spin text-gold-700" />
+        <span className="text-sm">Carregando dados cadastrais...</span>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-8">
       <div className="flex items-center gap-3">
         <Link
           to="/catequizandos"
-          className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+          className="p-2 text-carmel-700 hover:text-carmel-950 rounded-lg bg-white border border-carmel-200 hover:bg-carmel-100 transition-colors"
+          aria-label="Voltar"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="font-heading font-extrabold text-2xl text-white tracking-tight">
+          <h1 className="font-heading text-2xl sm:text-3xl text-carmel-950 tracking-tight">
             {isEdicao ? 'Editar Catequizando' : 'Novo Catequizando'}
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-sm text-carmel-600 mt-0.5">
             {isEdicao
               ? `Atualize as informações cadastrais da matrícula #${matricula}`
               : 'Preencha os dados para registrar um novo catequizando'}
@@ -121,19 +122,20 @@ export const CatequizandoForm: React.FC = () => {
       </div>
 
       {sucesso && (
-        <div className="p-4 rounded-lg bg-emerald-950/40 border border-emerald-800/60 text-emerald-200 text-xs flex items-center gap-2.5 animate-fadeIn">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm font-medium flex items-center gap-2.5 animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
           <span>{sucesso}</span>
         </div>
       )}
 
-      {erro && (
-        <ApiErrorAlert error={erro} />
-      )}
+      {erro && <ApiErrorAlert error={erro} />}
 
-      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border border-carmel-200 rounded-2xl p-6 sm:p-7 shadow-card space-y-4"
+      >
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-carmel-800 mb-1.5">
             Nome Completo *
           </label>
           <input
@@ -142,15 +144,13 @@ export const CatequizandoForm: React.FC = () => {
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             placeholder="Ex: Maria Clara dos Santos"
-            className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
+            className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 placeholder-carmel-400 focus:bg-white focus:border-gold-500"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              CPF *
-            </label>
+            <label className="block text-xs font-semibold text-carmel-800 mb-1.5">CPF *</label>
             <input
               type="text"
               required={!isEdicao}
@@ -158,17 +158,17 @@ export const CatequizandoForm: React.FC = () => {
               value={cpf}
               onChange={(e) => setCpf(e.target.value)}
               placeholder="000.000.000-00"
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-parish-500/50 disabled:opacity-50 disabled:cursor-not-allowed font-mono"
+              className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 placeholder-carmel-400 focus:bg-white focus:border-gold-500 disabled:opacity-60 disabled:bg-carmel-100 disabled:cursor-not-allowed font-mono tabular-nums"
             />
             {isEdicao && (
-              <span className="text-[10px] text-slate-500 mt-1 block">
+              <span className="text-[11px] text-carmel-500 mt-1 block">
                 O CPF não pode ser alterado após o cadastro.
               </span>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-carmel-800 mb-1.5">
               Telefone / WhatsApp
             </label>
             <input
@@ -176,13 +176,13 @@ export const CatequizandoForm: React.FC = () => {
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
               placeholder="(61) 99999-9999"
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
+              className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 placeholder-carmel-400 focus:bg-white focus:border-gold-500 tabular-nums"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-carmel-800 mb-1.5">
             E-mail de Contato
           </label>
           <input
@@ -190,21 +190,21 @@ export const CatequizandoForm: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="contato.aluno@email.com"
-            className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-parish-500/50"
+            className="w-full px-3.5 py-2.5 bg-carmel-50/70 border border-carmel-200 rounded-lg text-sm text-carmel-950 placeholder-carmel-400 focus:bg-white focus:border-gold-500"
           />
         </div>
 
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+        <div className="pt-4 border-t border-carmel-200 flex items-center justify-end gap-3">
           <Link
             to="/catequizandos"
-            className="px-4 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="px-4 py-2.5 rounded-lg text-xs font-semibold text-carmel-700 hover:text-carmel-950 hover:bg-carmel-100 transition-colors"
           >
             Cancelar
           </Link>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-parish-600 hover:bg-parish-500 disabled:opacity-60 text-white font-semibold text-xs transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-carmel-800 hover:bg-carmel-700 disabled:opacity-60 text-carmel-50 font-semibold text-xs transition-colors shadow-sm"
           >
             {isSubmitting ? (
               <>
